@@ -1,0 +1,209 @@
+<?php echo $this->tag->getDoctype(); ?>
+<?php
+/*
+  use MyCommon\Session\Pub\Lng;
+  echo $this->doctype();
+ * */
+$di = $this->getDI();
+$classviewmodtranslate =\MyCustomHelperClassTools::My_Core_Get_Classname('Viewmodtranslate');
+?>
+
+<html lang="<?php echo $di->controller_params_array['lng']; ?>">
+    <head>
+        <base href="<?php echo $this->getDI()->controller_params_array['html_base_path']; ?>" target="_self">
+        <link href="<?php echo $di->controller_params_array['site_templatepath']; ?>favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <title><?php echo $classviewmodtranslate::getKeyvalueFromKeyname('Ministry-of-National-Defence1'); ?>. <?php echo $di->controller_params_array['pagetitle']; ?></title>
+        <meta name="description" content="<?php echo $classviewmodtranslate::getKeyvalueFromKeyname('Ministry-of-National-Defence-Official-Web-Page1'); ?><?php echo $di->controller_params_array['pagedescription']; ?>">
+        <meta name="robots" content="<?php echo $di->controller_params_array['pagerobots']; ?>">
+        <meta name="keywords" content="<?php echo $classviewmodtranslate::getKeyvalueFromKeyname('Base-Keywords1'); ?>">
+        <!--[if lte IE 7]> <link href="<?php echo $di->controller_params_array['site_templatepath']; ?>css/ie7.css" media="screen" rel="stylesheet" type="text/css"><![endif]-->
+        <link href="<?php echo $di->controller_params_array['base_path_with_site_publicpath']; ?>css/custom.css" media="screen" rel="stylesheet" type="text/css">
+
+
+        <?php
+        $cache = MyCustomHelperCssBase64::My_Static_CssBase64_From_Json($di->controller_params_array['site_publicpath'], $di->controller_params_array['public_customrightbase64json'], $di->controller_params_array['public_customrightbase64css']);
+        if (!$cache->getCacheEnable()) {
+            echo '<style>' . $cache->getContent() . '</style>';
+        } else {
+            ?>
+            <link href="<?php echo $cache->getPubFilename(); ?>" media="screen" rel="stylesheet" type="text/css">
+            <?php
+        }
+        ?>
+
+        <?php
+        $cache = MyCustomHelperCssBase64::My_Static_CssBase64_From_Json($di->controller_params_array['site_publicpath'], $di->controller_params_array['public_custombase64json'], $di->controller_params_array['public_custombase64css']);
+        if (!$cache->getCacheEnable()) {
+            echo '<style>' . $cache->getContent() . '</style>';
+        } else {
+            ?>
+            <link href="<?php echo $cache->getPubFilename(); ?>" media="screen" rel="stylesheet" type="text/css">
+            <?php
+        }
+        ?>
+
+
+
+        <?php
+        $collectionname = $di->controller_params_array['lng'] . 'js1'.md5($this->view->getLayout());
+        $objjscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            5 => array('partialviewdir' => $di->controller_params_array['layout_desktop_view_folder'] . "dynpage/", 'partialviewname' => 'js-custom'),
+            7 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'includes/js/',
+                'filename' => 'joomla.javascript.js'
+            ),
+            10 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'media/system/js/',
+                'filename' => 'mootools.js'
+            ),
+            12 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'media/system/js/',
+                'filename' => 'modal.js'
+            ),
+            13 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'components/com_fgallery/js/',
+                'filename' => 'swfobject.js'
+            ),
+            14 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'components/com_fgallery/views/gallery/js/',
+                'filename' => 'swfhelper.js'
+            ),
+            15 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'plugins/system/jcemediabox/js/',
+                'filename' => 'mediaobject.js'
+            ),
+            16 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'plugins/system/jcemediabox/js/',
+                'filename' => 'jcemediabox.js'
+            ),
+            18 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'plugins/system/jcemediabox/addons/',
+                'filename' => 'default.js'
+            ),
+            20 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'plugins/system/jv_plg_slideshow/js/',
+                'filename' => 'jvslideshow.js'
+            ),
+            25 => array(
+                'path' => $di->controller_params_array['site_templatepath'] . 'zt_menus/zt_megamenu/',
+                'filename' => 'zt.megamenu.js'
+            ),
+            30 => array(
+                'path' => $di->controller_params_array['site_templatepath'] . 'js/',
+                'filename' => 'zt.script.js'
+            ),
+            40 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'modules/mod_roktabs/tmpl/',
+                'filename' => 'roktabs.js'
+            ),
+            50 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'static/',
+                'filename' => 'jquery-1.10.2.min.js'
+            ),
+            60 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'static/',
+                'filename' => 'jquery-migrate-1.2.1.min.js'
+            ),
+            70 => array(
+                'path' => $di->controller_params_array['site_templatepath'] . 'js/',
+                'filename' => 'noconflict1.js'
+            ),
+            80 => array(
+                'path' => $di->controller_params_array['site_templatepath'] . 'js/',
+                'filename' => 'jceonloadcustom.js'
+            ),
+            90 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'plugins/system/plg_ztools/assets/js/',
+                'filename' => 'bt_clear_cache.js'
+            ),
+            95 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'jeventcal/js/',
+                'filename' => 'jquery.eventCalendar.js'
+            ),
+            99 => array(
+                'path' => $di->controller_params_array['site_publicpath'] . 'js/',
+                'filename' => 'jquery.qtip-1.0.0-rc3.js'
+            ),
+        );
+
+        echo MyTags::MyCollectionJsGenerate($arr, $collectionname);
+        if ($cache->getCacheEnable()) {
+            
+        }
+        ?>
+    <!--[if lt IE 9]><script type="text/javascript" src="<?php echo $di->controller_params_array['site_publicpath']; ?>js/html5.js"></script><![endif]-->
+        <?php
+        /* $collectionname = 'jsModDesktopContentLay2';
+          $objjscollection = $this->assets->collection($collectionname);
+
+          $arr = array(
+          80 => array(
+          'path' => $di->controller_params_array['site_publicpath'] . 'jeventcal/js/',
+          'filename' => 'jquery.eventCalendar.js'
+          ),
+          90 => array(
+          'path' => $di->controller_params_array['site_publicpath'] . 'js/',
+          'filename' => 'jquery.qtip-1.0.0-rc3.js'
+          ),
+          100 => array(
+          'path' => $di->controller_params_array['site_templatepath'] . 'js/',
+          'filename' => 'noconflict1.js'
+          ),
+          );
+
+          echo MyTags::MyCollectionJsGenerate($arr, $collectionname);
+           */
+        ?>     
+
+
+
+
+<!--[if lt IE 6]><script type="text/javascript">
+//<!--
+window.addEvent ('load', function() {
+        ie_png.fix('.png');
+});
+//-->
+    </script> <![endif]--> 
+
+</head>
+<body id="bd" class="fs3   ltr">
+    <div id="zt-wrapper" class="">
+        <div id="zt-wrapper-inner">
+            <?php
+            $di->controller_params_array['menutype'] = CHMod20130918DConstantsMenu::CONST_MENU_MAINMENU;
+            $this->partial($di->controller_params_array['layout_desktop_view_folder'] . "common/header");
+            ?>
+            <?php //-echo $this->ModVHHeader(); ?>
+            <!-- #Main -->
+            <div id="zt-mainframe" >
+                <div class="zt-wrapper">
+                    <div id="zt-mainframe-inner">
+                        <div id="zt-container-left" class="clearfix zt-layout-clr">
+                            <div id="zt-left">
+                                <?php $this->partial($di->controller_params_array['layout_desktop_view_folder'] . "common/rightcolindex"); ?>
+                                <?php //-echo $this->ModVHRightColLayoutIndex();   ?>                                                                                                                   
+                            </div>
+                            <div id="zt-content">
+                                <?php //echo CHMod20130918DMenuBreadGrumb::getModMenuBreadGrumb(); ?>
+                                <?php
+                                echo $this->getContent();
+//echo $this->ModVHRightCalendar() ;
+                                ?>
+                                <?php echo CHMod20130918DContactIndex::getContactIndex(); ?>  
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="clearfix"> </div>
+                    </div>
+                </div>
+            </div>
+            <!-- #End Main -->
+            <?php $this->partial($di->controller_params_array['layout_desktop_view_folder'] . "common/footer"); ?>
+            <?php //-echo $this->ModVHFooter();   ?>   
+        </div>
+    </div>
+</body>
+</html>

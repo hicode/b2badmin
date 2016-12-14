@@ -1,0 +1,17 @@
+public/
+public/template/
+public/template/metronic_v4.5.4/
+public/template/metronic_v4.5.4/theme/
+public/template/metronic_v4.5.4/theme/admin_1*/
+public/template/metronic_v4.5.4/theme/admin_1*/***
+public/template/metronic_v4.5.4/theme/assets/
+public/template/metronic_v4.5.4/theme/assets/***
+public/template/metronic_v4.5.4/theme/sass/
+public/template/metronic_v4.5.4/theme/sass/***
+apps/***
+public/custom/
+public/custom/***
+public/index.php
+public/.htaccess
+.htaccess
+index.php

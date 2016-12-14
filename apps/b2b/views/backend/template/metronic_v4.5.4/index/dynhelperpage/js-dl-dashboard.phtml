@@ -1,0 +1,166 @@
+//<script>
+
+    $('html').delegate('#AddSC', 'click', function () {
+        DlDashboard.registerMembersSuggestion($(this));
+        /*$(this).confirmation({
+         title: 'Αναζητηση Πελάτη <a class="btn pull-right" data-dismiss="confirmation"></a>',
+         btnCancelClass: 'btn-xs btn-circle btn-outline red',
+         btnCancelIcon: 'fa fa-times',
+         btnCancelLabel: '&nbsp;',
+         template:
+         '<div class="popover confirmation">' +
+         '<div class="arrow"></div>' +
+         '<h3 class="popover-title"></h3>' +
+         '<div class="popover-content">' +
+         '<input class="form-control text-center input-medium" onclick="DlDashboard.registerMembersSuggestion($(this));" />' +
+         '</div>' +
+         '</div>'
+         });*/
+    });
+
+    var DlDashboard = {
+        NewMember: function () {
+            var pagename = "<?php
+echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM2, array(
+    'helperpage' => 'new_record',
+    'param1' => B2b\Models\CoreModels\PpB2bAdminMetronic454PluginNewRecord::Get_Post_PluginGetNewRecordTplAction(),
+    'param2' => B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Post_Param1_Key_inner_home_crm_members_new())
+);
+?>";
+            var newrecord = DlNewRecord({page: pagename, form: '.dl-cc-new-record'});
+            newrecord.Init();
+        },
+        AddMembers: function () {
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => 'inner_home_crm_members')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        AddPackets: function () {
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_packets')); ?>', '', function (data) {
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        AddServices: function () {
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_services')); ?>', '', function (data) {
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        AddReceipts: function () {
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_receipts')); ?>', '', function (data) {
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        AddIncomesExpenses: function () {
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_income_expenses')); ?>', '', function (data) {
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        registerMembersSuggestion: function (obj) {
+            var $this = this;
+            var SCOrigField = obj;
+            var tpl = '<?php echo json_encode(B2b\Models\CoreModels\DlB2bAdminGeneralHelper::Get_AddSC_Search_Tpl()); ?>';
+            obj.replaceWith(tpl.substring(1, tpl.length - 1));
+            var membersSelection = $('#SCMembersSuggestion');
+            $('.close-suggestion', membersSelection.closest('.suggestion-parent')).off('click').on('click', function () {
+                membersSelection.closest('.suggestion-parent').replaceWith(SCOrigField);
+            });
+            var murl = '<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM2, array('helperpage' => 'posts', 'param1' => 'action_suggestion', 'param2' => 'members')); ?>';
+            var suggestion = new Bloodhound({
+                datumTokenizer: function (data) {
+                    return data.tokens;
+                },
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: murl + '%QUERY/',
+                    wildcard: '%QUERY'
+                }
+            });
+            suggestion.initialize();
+            membersSelection.typeahead('destroy').typeahead(null, {
+                highlight: false,
+                displayKey: 'key',
+                hint: false,
+                source: suggestion.ttAdapter(),
+                limit: 10
+            });
+            membersSelection.bind('typeahead:select', function (ev, su) {
+                $this.proceedWithNewSCAdd(su.id, su.key);
+                membersSelection.closest('.suggestion-parent').replaceWith(SCOrigField);
+            });
+        },
+        proceedWithNewSCAdd: function (id, key) {
+            var pagename = "<?php
+echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM2, array(
+    'helperpage' => 'new_record',
+    'param1' => B2b\Models\CoreModels\PpB2bAdminMetronic454PluginNewRecord::Get_Post_PluginGetNewRecordTplAction(),
+    'param2' => B2b\Models\CoreModels\PpB2bAdminMetronic454PluginNewRecord::Get_Post_Param1_Key_inner_home_crm_service_contracts_new())
+);
+?>" + id + "/";
+            var ccurl = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => 'data-table-ajax/inner_home_crm_members_details')); ?>";
+            ccurl += 'action_view/tab4_' + id + '_<?php echo MyCustomHelperLng::My_get_current_lng_id(); ?>/?dataID=' + id + '_<?php echo MyCustomHelperLng::My_get_current_lng_id(); ?>&unid_=' + (new Date().getTime());
+            DlGeneralAjax.getAjaxData(ccurl, '', function (tpl) {
+                var newrecord = DlNewRecord({
+                    page: pagename,
+                    extratpl: tpl,
+                    form: '.dl-cc-new-record',
+                    // Temporary data
+                    extra: 1,
+                    pkfield: 'fkcustomer',
+                    id: id
+                });
+                newrecord.Init();
+            }, {"dataType": "html", "async": false});
+        }
+    };
+//</script>

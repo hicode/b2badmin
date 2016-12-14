@@ -1,0 +1,102 @@
+//<script>
+
+
+    $('html').delegate('.printsinglepdf', 'click', function () {
+        var btn = $(this);
+        var pdf = DlPDF({
+            'element': btn,
+            'pageparams': true,
+            'pageparamsvalues': {
+                'param3': btn.attr('data-lng'),
+                'param4': btn.attr('data-id'),
+                'param5': btn.attr('data-type')
+            }
+        });
+        pdf.Print();
+    });
+
+    var DlPDF = function (options) {
+        var defs = {
+            ajax: {
+                'url': '<?php
+$di = Phalcon\DI::getDefault();
+echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM2, array(
+    'helperpage' => 'print_pdf',
+    'mykatastima' => 'mykatastimaforreplace',
+    'param1' => B2b\Models\CoreModels\DlB2bAdminMetronic454PluginPrintPDF::Get_Post_Plugin_Print_Single_PDF_Action(),
+    'param2' => B2b\Models\CoreModels\DlB2bAdminMetronic454PluginPrintPDF::Get_Print_PDF_Helper_Page())
+);
+?>',
+                'data': {},
+                'async': false,
+                'type': "POST",
+                'dataType': "json",
+                'doBeforeSend': function () {},
+                'doAfterComplete': function () {}
+            },
+            'pageparams': false,
+            'pageparamsvalues': {
+                'param3': 'none',
+                'param4': 'none',
+                'param5': 'none',
+                'param6': 'none'
+            },
+            'element': '',
+            'newtab': true,
+            'sendtoprinter': false
+        };
+        var params = !$.isEmptyObject(options) ? $.extend({}, defs, options) : defs;
+        var $this = this;
+
+        getPDF = function () {
+            return {};
+//            $.ajax({
+//                url: params.ajax.url,
+//                data: params.ajax.data,
+//                async: params.ajax.async,
+//                type: params.ajax.type,
+//                dataType: params.ajax.dataType,
+//                beforeSend: params.ajax.doBeforeSend,
+//                complete: params.ajax.doAfterComplete,
+//                success: function (result) {
+//                    console.log( result );
+//                },
+//                error: function (a, b, c) {
+//                    alert('Error on making request');
+//                } 
+//            });
+        };
+
+        printPDF = function () {
+            window.open(params.ajax.url, params.newtab ? '_blank' : '');
+        };
+        
+        fixURLParamsvalues = function () {
+            var urlparams = '';
+            $.each(params.pageparamsvalues, function (key, value) {
+                if (value != 'none') {
+                    urlparams += value + '/';
+                }
+            });
+            return urlparams;
+        };
+        
+        fixURL = function () {
+            var mykatastima = 'kifisia';
+            params.ajax.url = params.ajax.url.replace('/mykatastimaforreplace/', '/' + mykatastima + '/');
+            if( params.pageparams ) {
+                var paramvalues = $this.fixURLParamsvalues();
+                params.ajax.url += paramvalues;
+            }
+        };
+
+        return {
+            "Print": function () {
+                $this.fixURL();
+                //$this.getPDF();
+                $this.printPDF();
+            }
+        };
+    };
+
+//</script>

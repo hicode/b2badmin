@@ -1,0 +1,64 @@
+<?php
+// TODO: Na figei o kwdikas apo edw kai na paei Pp...
+$di = \Phalcon\DI::getDefault();
+$action = $di->controller_params_array['param1'];
+
+if ($action === 'action_suggestion') {
+    $suggestions = \B2b\Models\CoreModels\PpB2bAdminSuggestionEngineHelper::Get_Suggestions();
+    echo json_encode($suggestions);
+} else if ($action === 'action_eventsave') {
+    B2b\Models\CoreModels\DlB2bAdminFullCalendar::Save_Event();
+} else if ($action === 'action_tmpeventdata') {
+    $id = $action = $di->controller_params_array['glb_request']['data'];
+    $classname = \MyCustomHelperClassTools::My_Core_Get_Classname('corecrmevent');
+    $data = $classname::find(array(
+                'conditions' => 'bldeleted = :bldeleted: AND bldisabled = :bldisabled: AND blpublished = :blpublished: AND id = :id:',
+                'bind' => array(
+                    'bldeleted' => 0,
+                    'bldisabled' => 0,
+                    'blpublished' => 1,
+                    'id' => $id
+                )
+            ))->toArray();
+    $resource = $data[0]['fkplugincalendarresource'];
+    $category = $data[0]['fkcategory'];
+    $resourcetxt = ' - ';
+    $categorytxt = ' Χωρίς κατηγορία';
+    $timestart = substr(spliti(' ', $data[0]['dtstart'])[1], 0, -3);
+    $timeend = substr(spliti(' ', $data[0]['dtend'])[1], 0, -3);
+    if ($resource != '-1') {
+        $resclassname = \MyCustomHelperClassTools::My_Core_Get_Classname('corecrmplugincalendarresource');
+        $resdata = $resclassname::find(array(
+                    'conditions' => 'bldeleted = :bldeleted: AND bldisabled = :bldisabled: AND blpublished = :blpublished: AND id = :id:',
+                    'bind' => array(
+                        'bldeleted' => 0,
+                        'bldisabled' => 0,
+                        'blpublished' => 1,
+                        'id' => $resource
+                    )
+                ))->toArray();
+        $resourcetxt = explode(' ', $resdata[0]['title'])[1];
+    }
+    if ($category != '-1') {
+        $catclassname = \MyCustomHelperClassTools::My_Core_Get_Classname('corecrmavailableservice');
+        $catdata = $catclassname::find(array(
+                    'conditions' => 'bldeleted = :bldeleted: AND bldisabled = :bldisabled: AND blpublished = :blpublished: AND id = :id:',
+                    'bind' => array(
+                        'bldeleted' => 0,
+                        'bldisabled' => 0,
+                        'blpublished' => 1,
+                        'id' => $category
+                    )
+                ))->toArray();
+        $categorytxt = $catdata[0]['title'];
+    }
+    $html =<<< EOD
+            Ώρα έναρξης:    $timestart\n
+            Ώρα λήξης:      $timeend\n
+            Αίθουσα:        $resourcetxt\n
+            Κατηγορία:      $categorytxt\n
+EOD;
+    echo json_encode($html);
+} else {
+    echo json_encode(array());
+}

@@ -1,0 +1,463 @@
+<?php $assetspath = $di->controller_params_array['template']['template_admin_path_assets']; ?>
+<!-- BEGIN PAGE HEADER-->
+
+<?php //echo CHMod20130918DulePiecePortlet::get_div_ajax_large(); ?>
+<?php echo Metronic362CCustomHelperAjax::get_div_ajax_full(); ?>
+
+
+
+<!-- BEGIN SAMPLE PORTLET CONFIGURATION MODAL FORM-->
+<div class="modal fade" id="main-actions-row-new" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">New Row Properties</h4>
+            </div>
+            <div class="modal-body">
+                Widget settings form goes here
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn blue">Save changes</button>
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+<div class="modal fade" id="group-settings" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">New Row Properties</h4>
+            </div>
+            <div class="modal-body">
+                Widget settings form goes here
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn blue">Save changes</button>
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+
+
+<!-- BEGIN SAMPLE PORTLET CONFIGURATION MODAL FORM-->
+<div class="modal fade" id="portlet-config" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                Widget settings form goes here
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn blue">Save changes</button>
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<!-- END SAMPLE PORTLET CONFIGURATION MODAL FORM-->
+
+
+
+
+
+<h3 class="page-title">
+        Application Modules Edit<!-- <small>database tables</small>-->
+</h3>
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="#/dashboard.html">Home</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#/datatables/advanced.html">Settings</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            Application Modules Edit
+        </li>
+    </ul>
+    <div class="page-toolbar">
+        <div class="btn-group pull-right">
+            <button type="button" class="btn btn-fit-height grey-salt dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="1000" data-close-others="true">
+                Actions <i class="fa fa-angle-down"></i>
+            </button>
+            <ul class="dropdown-menu pull-right" role="menu">
+                <li>
+                    <a href="#main-actions-row-new" data-toggle="modal">
+                        <i class="fa fa-plus-square-o"></i> New Row </a>
+                </li>
+
+
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- END PAGE HEADER-->
+<!-- BEGIN PAGE CONTENT-->
+<div class="note note-success">
+    <p>
+        Here you can create or edit a module .
+
+    </p>
+</div>
+
+<?php
+$obj = B2b\Models\ProductionModels\B2bAioModules::findFirst($di->controller_params_array['param1_cleanid']);
+$modulesarr = json_decode($obj->getAliasModulemetadata(), true);
+$modulesarr['data']['lng'] = $di->controller_params_array['lng'];
+$modulesarr['data']['portletid'] = $di->controller_params_array['param1_cleanid'];
+$modulesarr['data']['modalmoduleid'] = $di->controller_params_array['param1_cleanid'];
+//$paramsarr = array(
+//    'rowtitleupper' => 'First row ',
+//    'rowtitledetails' => 'details...',
+//    'rowcols' => 'kalimera'
+//);
+//echo CHMod20130918DulePiecePortlet::My_get_mod_row($paramsarr);
+$modulesarr1 = array(
+    'data' => array(
+        'lng' => $di->controller_params_array['lng'],
+        'headtitle' => array(
+            'en' => 'Module Content',
+            'el' => 'Περιεχόμενα'
+        ),
+        'portletid' => 1,
+        'modalmoduleid' => $di->controller_params_array['param1']
+    ),
+    'rows' => array(
+        array(
+            'data' => array(
+                'headtitle' => array(
+                    'en' => 'Module Content',
+                    'el' => 'Περιεχόμενα'
+                ),
+                'portletid' => 2,
+            ),
+            'rowcols' => array(
+                array(
+                    'data' => array(
+                        'width' => 4,
+                        'headtitle' => array(
+                            'en' => 'Module Content',
+                            'el' => 'Περιεχόμενα'
+                        ),
+                        'portletid' => 3,
+                    ),
+                    'rowgroups' => array(
+                        array(
+                            'data' => array(
+                                'grouptype' => AGCHParams::$Settings_Module_Portlet_Type_Group_Piece_2,
+                                'headtitle' => array(
+                                    'en' => 'Module Content',
+                                    'el' => 'Περιεχόμενα'
+                                ),
+                                'portletid' => 4,
+                            ),
+                            'rowpieces' => array(
+                                array(
+                                    'data' => array(
+                                        'headtitle' => array(
+                                            'en' => 'Module Content',
+                                            'el' => 'Περιεχόμενα'
+                                        ),
+                                        'portlet-body-headingtext' => 'heading from template',
+                                        'portlet-body-body' => 'body from template',
+                                        'portletid' => 5,
+                                    ),
+                                ),
+                                array(
+                                    'data' => array(
+                                        'headtitle' => array(
+                                            'en' => 'Module Content',
+                                            'el' => 'Περιεχόμενα'
+                                        ),
+                                        'portlet-body-headingtext' => 'heading from template',
+                                        'portlet-body-body' => 'body from template',
+                                        'portletid' => 6,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                array(
+                    'data' => array(
+                        'width' => 4,
+                        'headtitle' => array(
+                            'en' => 'Module Content',
+                            'el' => 'Περιεχόμενα'
+                        ),
+                        'portletid' => 7,
+                    ),
+                    'rowgroups' => array(
+                        array(
+                            'data' => array(
+                                'grouptype' => AGCHParams::$Settings_Module_Portlet_Type_Group_Piece_2,
+                                'headtitle' => array(
+                                    'en' => 'Module Content',
+                                    'el' => 'Περιεχόμενα'
+                                ),
+                                'portletid' => 8,
+                            ),
+                            'rowpieces' => array(
+                                array(
+                                    'data' => array(
+                                        'headtitle' => array(
+                                            'en' => 'Module Content',
+                                            'el' => 'Περιεχόμενα'
+                                        ),
+                                        'portlet-body-headingtext' => 'heading from template',
+                                        'portlet-body-body' => 'body from template',
+                                        'portletid' => 9,
+                                    ),
+                                ),
+                                array(
+                                    'data' => array(
+                                        'headtitle' => array(
+                                            'en' => 'Module Content',
+                                            'el' => 'Περιεχόμενα'
+                                        ),
+                                        'portlet-body-headingtext' => 'heading from template',
+                                        'portlet-body-body' => 'body from template',
+                                        'portletid' => 10,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        array(
+            'data' => array(
+                'headtitle' => array(
+                    'en' => 'Module Content',
+                    'el' => 'Περιεχόμενα'
+                ),
+                'portletid' => 11,
+            ),
+            'rowcols' => array(
+                array(
+                    'data' => array(
+                        'colwidth' => 4,
+                        'headtitle' => array(
+                            'en' => 'Module Content',
+                            'el' => 'Περιεχόμενα'
+                        ),
+                        'portletid' => 12,
+                    ),
+                    'rowgroups' => array(
+                        array(
+                            'data' => array(
+                                'grouptype' => AGCHParams::$Settings_Module_Portlet_Type_Group_Piece_2,
+                                'headtitle' => array(
+                                    'en' => 'Module Content',
+                                    'el' => 'Περιεχόμενα'
+                                ),
+                                'portletid' => 13,
+                            ),
+                            'rowpieces' => array(
+                                array(
+                                    'data' => array(
+                                        'headtitle' => array(
+                                            'en' => 'Module Content',
+                                            'el' => 'Περιεχόμενα'
+                                        ),
+                                        'portlet-body-headingtext' => 'heading from template',
+                                        'portlet-body-body' => 'body from template',
+                                        'portletid' => 14,
+                                    ),
+                                ),
+                                array(
+                                    'data' => array(
+                                        'headtitle' => array(
+                                            'en' => 'Module Content',
+                                            'el' => 'Περιεχόμενα'
+                                        ),
+                                        'portlet-body-headingtext' => 'heading from template',
+                                        'portlet-body-body' => 'body from template',
+                                        'portletid' => 15,
+                                    ),
+                                ),
+                            ),
+                        ),
+                        array(
+                            'data' => array(
+                                'grouptype' => AGCHParams::$Settings_Module_Portlet_Type_Group_Row_2,
+                                'headtitle' => array(
+                                    'en' => 'Module Content',
+                                    'el' => 'Περιεχόμενα'
+                                ),
+                                'portletid' => 16,
+                            ),
+                            'rows' => array(
+                                array(
+                                    'data' => array(
+                                        'headtitle' => array(
+                                            'en' => 'Module Content',
+                                            'el' => 'Περιεχόμενα'
+                                        ),
+                                        'portletid' => 17,
+                                    ),
+                                    'rowcols' => array(
+                                        array(
+                                            'data' => array(
+                                                'width' => 6,
+                                                'headtitle' => array(
+                                                    'en' => 'Module Content',
+                                                    'el' => 'Περιεχόμενα'
+                                                ),
+                                                'portletid' => 18,
+                                            ),
+                                            'rowgroups' => array(
+                                                array(
+                                                    'data' => array(
+                                                        'grouptype' => AGCHParams::$Settings_Module_Portlet_Type_Group_Piece_2,
+                                                        'headtitle' => array(
+                                                            'en' => 'Module Content',
+                                                            'el' => 'Περιεχόμενα'
+                                                        ),
+                                                        'portletid' => 19,
+                                                    ),
+                                                    'rowpieces' => array(
+                                                        array(
+                                                            'data' => array(
+                                                                'headtitle' => array(
+                                                                    'en' => 'Module Content',
+                                                                    'el' => 'Περιεχόμενα'
+                                                                ),
+                                                                'portlet-body-headingtext' => 'heading from template',
+                                                                'portlet-body-body' => 'body from template',
+                                                                'portletid' => 20,
+                                                            ),
+                                                        ),
+                                                        array(
+                                                            'data' => array(
+                                                                'headtitle' => array(
+                                                                    'en' => 'Module Content',
+                                                                    'el' => 'Περιεχόμενα'
+                                                                ),
+                                                                'portlet-body-headingtext' => 'heading from template',
+                                                                'portlet-body-body' => 'body from template',
+                                                                'portletid' => 21,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                        array(
+                                            'data' => array(
+                                                'width' => 6,
+                                                'headtitle' => array(
+                                                    'en' => 'Module Content',
+                                                    'el' => 'Περιεχόμενα'
+                                                ),
+                                                'portletid' => 22,
+                                            ),
+                                            'rowgroups' => array(
+                                                array(
+                                                    'data' => array(
+                                                        'grouptype' => AGCHParams::$Settings_Module_Portlet_Type_Group_Piece_2,
+                                                        'headtitle' => array(
+                                                            'en' => 'Module Content',
+                                                            'el' => 'Περιεχόμενα'
+                                                        ),
+                                                        'portletid' => 23,
+                                                    ),
+                                                    'rowpieces' => array(
+                                                        array(
+                                                            'data' => array(
+                                                                'headtitle' => array(
+                                                                    'en' => 'Module Content',
+                                                                    'el' => 'Περιεχόμενα'
+                                                                ),
+                                                                'portlet-body-headingtext' => 'heading from template',
+                                                                'portlet-body-body' => 'body from template',
+                                                                'portletid' => 24,
+                                                            ),
+                                                        ),
+                                                        array(
+                                                            'data' => array(
+                                                                'headtitle' => array(
+                                                                    'en' => 'Module Content',
+                                                                    'el' => 'Περιεχόμενα'
+                                                                ),
+                                                                'portlet-body-headingtext' => 'heading from template',
+                                                                'portlet-body-body' => 'body from template',
+                                                                'portletid' => 25,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    ),
+);
+//$json=  json_encode($modulesarr);
+$modulesarr = CHMod20130918DulePiecePortlet::select_lang($modulesarr, $di->controller_params_array['lng']);
+$modulesarr['controller_params_array'] = $di->controller_params_array;
+$txt = CHMod20130918DulePiecePortlet::My_get_module($modulesarr);
+echo $txt;
+
+//$json=  json_encode($modulesarr);
+//echo $json;
+//$allarr['pieces'][0]=>
+?>
+
+
+
+
+<!-- END PAGE CONTENT-->
+<!-- BEGIN MAIN JS -->
+<!-- BEGIN PAGE LEVEL SCRIPTS -->
+
+<!-- END PAGE LEVEL SCRIPTS -->
+<script>
+    runeveryinner();
+    //jQuery(document).ready(function () {
+
+    // initiate layout and plugins
+
+    //     Layout.init(); // init current layout
+    //     QuickSidebar.init(); // init quick sidebar
+    //     Demo.init(); // init demo features
+    $('.portlet .portlet-title a.reload[data-load="true"]').click();////////Metronic.init(); // init metronic core components
+    //Layout.init(); // init current layout
+    //QuickSidebar.init(); // init quick sidebar
+    //Demo.init(); 
+    var MyModalOnClose = function () {
+        //grid.getDataTable().ajax.reload();
+    }
+    PortletDraggable.init();
+    //handleModals();
+    //});
+</script>
+<!-- END MAIN JS -->

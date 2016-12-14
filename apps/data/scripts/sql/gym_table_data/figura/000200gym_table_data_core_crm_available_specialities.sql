@@ -1,0 +1,5 @@
+--INSERT INTO core_crm_available_specialities (myid,mykatastima,title, aliasname) VALUES 
+--(1,:mykatastima,'Ζούμπα', 'zoumpa'),
+--(2,:mykatastima,'Γιόγκα', 'giogka'),
+--(3,:mykatastima,'Πιλάτες', 'pilates'),
+--(4,:mykatastima,'Καράτε', 'karate');

@@ -1,0 +1,77 @@
+<?php
+$di = Phalcon\DI::getDefault();
+?>
+<!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+<div class="menu-toggler sidebar-toggler">
+</div>
+<!-- END SIDEBAR TOGGLER BUTTON -->
+<?php $this->partial($di->controller_params_array['template']['template_view_dir'] . "login/logo") ?>
+<!-- BEGIN LOGIN -->
+<div class="content">
+    <!-- BEGIN LOGIN FORM -->
+    <form class="login-form" action="" method="post">
+        <h3 class="form-title">Sign In</h3>
+        <div class="alert alert-danger display-hide">
+            <button class="close" data-close="alert"></button>
+            <span>
+                <?php echo $di->controller_params_array['form']['errmsg']; ?> </span>
+        </div>
+        <div class="form-group">
+            <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+            <label class="control-label visible-ie8 visible-ie9">Username</label>
+            <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="Username" name="username"/>
+        </div>
+        <div class="form-group">
+            <label class="control-label visible-ie8 visible-ie9">Password</label>
+            <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="Password" name="password"/>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success uppercase">Login</button>
+            <input type="hidden" name='sessid' value="<?php echo $this->session->getId(); ?>"/>
+
+            <?php
+            if ($di->controller_params_array['template']['template_admin_login_remember_show'] == true) {
+                ?>
+                <label class="rememberme check">
+                    <input type="checkbox" name="remember" value="1"/>Remember </label>
+                <?php
+            }
+            ?>
+            <?php
+            if ($di->controller_params_array['template']['template_admin_login_forgotpassword_show'] == true) {
+                ?>
+                <a href="javascript:;" id="forget-password" class="forget-password">Forgot Password?</a>
+                <?php
+            }
+            ?>
+        </div>
+        <?php
+        if ($di->controller_params_array['template']['template_admin_login_social_show'] == true) {
+            $this->partial($di->controller_params_array['template']['template_view_dir'] . "login/options");
+        }
+        ?>
+        <?php
+        if ($di->controller_params_array['template']['template_admin_login_registration_show'] == true) {
+            ?>
+            <div class="create-account">
+                <p>
+                    <a href="javascript:;" id="register-btn" class="uppercase">Create an account</a>
+                </p>
+            </div>
+            <?php
+        }
+        ?>
+    </form>
+    <!-- END LOGIN FORM -->
+    <?php
+    if ($di->controller_params_array['template']['template_admin_login_forgotpassword_show'] == true) {
+        $this->partial($di->controller_params_array['template']['template_view_dir'] . "login/forgotpassword");
+    }
+    ?>
+    <?php
+    if ($di->controller_params_array['template']['template_admin_login_registration_show'] == true) {
+        $this->partial($di->controller_params_array['template']['template_view_dir'] . "login/registration");
+    }
+    ?>
+</div>
+<!-- END LOGIN -->

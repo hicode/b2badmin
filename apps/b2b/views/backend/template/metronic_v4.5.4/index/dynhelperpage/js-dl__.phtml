@@ -1,0 +1,673 @@
+<?php
+$di = Phalcon\DI::getDefault();
+$cpa = &$di->controller_params_array;
+$calendarpluginarrparams = $cpa[\CHCrmCParams::$keyarrFullCalendar];
+$cpasettings = $cpa['settings'];
+?>
+//<script>
+
+    var Dl = {
+        dtDefs: {
+            "format": "dd-mm-yyyy",
+            "rtl": App.isRTL(),
+            "orientation": "right",
+            "autoclose": true,
+            "multidate": false,
+            "minDate": false
+        },
+        Gen: {
+            formatDate: function (obj, sep, rev) {
+                sep = typeof sep == 'undefined' || sep == '' ? '-' : sep;
+                rev = rev != true ? false : true;
+                if (rev === true) {
+                    return {
+                        "date": obj.getFullYear() + sep + (obj.getMonth() + 1) + sep + (obj.getDate()),
+                        "format": "yyyy" + sep + "mm" + sep + "dd",
+                        "data": {
+                            "orig": obj,
+                            "seperator": sep,
+                            "reverse": rev
+                        }
+                    };
+                } else {
+                    return {
+                        "date": (obj.getDate()) + sep + (obj.getMonth() + 1) + sep + obj.getFullYear(),
+                        "format": "dd" + sep + "mm" + sep + "yyyy",
+                        "data": {
+                            "orig": obj,
+                            "seperator": sep,
+                            "reverse": rev
+                        }
+                    };
+                }
+
+            },
+            generateDates: function (from, to) {
+                var dates = [];
+                for (var i = new Date(from); i <= new Date(to); i.setDate(i.getDate() + 1)) {
+                    dates.push(new Date(i));
+                }
+                return dates;
+            }
+        },
+        Datepicker: {
+            init: function (element, options) {
+                options = !$.isEmptyObject(options) ? $.extend({}, Dl.dtDefs, options) : Dl.dtDefs;
+                element.datepicker(options);
+            },
+            initMultiDate: function (element) {
+                Dl.Datepicker.remove(element);
+                element.datepicker($.extend({}, Dl.dtDefs, {"multidate": true}));
+            },
+            initSingleDate: function (element) {
+                Dl.Datepicker.remove(element);
+                element.datepicker(Dl.dtDefs);
+            },
+            remove: function (element) {
+                element.datepicker('remove');
+            },
+            setDate: function (element, date) {
+                element.datepicker('update', date);
+            }
+        },
+        Calendar: {
+            showQuickTpls: function (calendar, element, view) {
+                if (view.name == 'agendaDay' || view.name == 'month') {
+                    $('.event-quick-tpls-md', element).removeClass('hidden');
+                }
+                if (view.name == 'agendaWeek') {
+                    $('.event-quick-tpls-w', element).removeClass('hidden');
+                }
+            },
+            hideQuickTpls: function (calendar, element, view) {
+                if (view.name == 'agendaDay' || view.name == 'month') {
+                    $('.event-quick-tpls-md', element).addClass('hidden');
+                }
+                if (view.name == 'agendaWeek') {
+                    $('.event-quick-tpls-w', element).addClass('hidden');
+                }
+            },
+            renderEventWidth: function (calendar, element, view) {
+                //DL-TODO na to valw apo settings an einai na dwsw custom width
+                view.name === 'agendaDay' && $.isEmptyObject(calendar.fullCalendar('getResources')) ? element.css('width', '15%') : '';
+            },
+            renderQuickTpls: function (calendar, element, view) {
+                // Vazw mia grami anamesa sto title kai sto content
+                //element.find('.fc-title').css('border-bottom', '1px solid white');
+                var html = '<div class="event-quick-tpls-md hidden text-center" style="z-index:100; width: 100%;">' +
+                        '<a class="event-qtpls" data-tpl="addmembers" title="Add Person" style="margin:3px;padding:2px;">' +
+                        '<i class="fa fa-user-plus" style="color:white;"></i>' +
+                        '</a>' +
+                        '<a class="event-qtpls" data-tpl="copy" title="Copy" style="margin:3px;padding:2px;">' +
+                        '<i class="fa fa-copy" style="color:white;"></i>' +
+                        '</a>' +
+                        '<a class="event-qtpls" data-tpl="more" title="More" style="margin:3px;padding:2px;">' +
+                        '<i class="fa fa-ellipsis-h" style="color:white;"></i>' +
+                        '</a>' +
+                        '<a class="event-qtpls" data-tpl="delete" title="Delete Event" style="margin:3px;padding:2px;">' +
+                        '<span class="glyphicon glyphicon-trash" style="color:white;"></span>' +
+                        '</a>' +
+                        '</div>' +
+                        '<div class="event-quick-tpls-w hidden text-center" style="z-index:100; width: 100%;">' +
+                        '<a class="event-qtpls" data-tpl="more" title="More" style="margin:3px;padding:2px;">' +
+                        '<i class="fa fa-ellipsis-h" style="color:white;"></i>' +
+                        '</a>' +
+                        '</div>';
+//                        var html = '<button id="myconfrim" class="btn red btn-small" data-toggle="confirmation" data-original-title="Confirm"'
+//                                    +'title="">Default configuration</button>';
+                $('.fc-content', element).children(':first').before(html);
+                //$('.fc-content', element).append(html);
+            },
+            quickTplsListeners: function (event, element) {
+                //$('#myconfrim', element).confirmation();
+                $('.event-qtpls', element).on('click', function () {
+                    var data = {
+                        "id": event.id,
+                        "tpl": $(this).attr('data-tpl')
+                    };
+                    Dl.Calendar.loadQuickTpl(data);
+                });
+            },
+            quickTplsEffect: function (event, element, eff) {
+                if (eff === true) {
+                    $('.event-qtpls', element).hover(function () {
+                        $(this)
+                                .css("background-color", "lightblue");
+                    }, function () {
+                        $(this)
+                                .css("background-color", "");
+                    });
+                } else {
+                    return false;
+                }
+            },
+            loadQuickTpl: function (obj) {
+                ModalGeneral.load($('#<?php echo \B2b\Models\CoreModels\DlB2bAdminFullCalendar::Get_Create_Event_Modal_Quick_Tpls_ID(); ?>'), '<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => B2b\Models\CoreModels\DlB2bAdminFullCalendar::Get_Create_Event_Modal_Quick_Tpls_Helper_Page_Name())); ?>' + obj.id + '/' + obj.tpl, function (ModalQuickTpls) {
+                    ModalQuickTpls.modal({
+                        "width": (parseFloat($(window).width()) * 0.80)
+                    });
+                });
+            },
+            addMembers: function () {
+                ModalGeneral.load($('#<?php echo \B2b\Models\CoreModels\DlB2bAdminFullCalendar::Get_Create_Event_Modal_Add_Member_ID(); ?>'), '<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => \B2b\Models\CoreModels\DlB2bAdminFullCalendar::Get_Create_Event_Modal_Add_Members_Helper_Page_Name())); ?>', function (ModalMembers) {
+                    ModalMembers.modal({
+                        "width": (parseFloat($(window).width()) * 0.80)
+                    });
+
+                    runeveryinner();
+                    var MyModalInitPage = function () {
+                        Form1Click();
+                    };
+                    var MyModalOnClose = function () {
+                        //alert('close');
+                        grid.getDataTable().ajax.reload();
+                    };
+<?php
+B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_myaoColumns(CHCrmCParams::$keyarrDataTableAjax);
+?>
+                    myaoColumns = <?php echo $cpa[CHCrmCParams::$keyarrDataTableAjax]['myaoColumns']; ?>;
+<?php
+echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Js_Function_MyRunForm();
+?>
+                    //TableAjax.init('datatable_ajax');
+                    //UIGeneral.init();
+                    MyRunForm();
+
+                });
+            },
+            addTrainers: function () {},
+            saveEvents: function (form) {
+                var metadata = {
+                    'id': '<?php echo $calendarpluginarrparams['id']; ?>'
+                };
+                var data = {
+                    event_status: $('select[name="event_status"] :selected', form).attr('data-id'),
+                    event_type: $('select[name="event_type"] :selected', form).attr('data-id'),
+                    event_resource: $('select[name="assigned_resource"] :selected', form).attr('data-id'),
+                    event_participant_trainers: '',
+                    event_participant_members: '',
+                    event_start_datetime: $('input[name="start_date"]', form).val(),
+                    event_end_datetime: $('input[name="end_date"]', form).val()
+                };
+                if ($('#repeat-event', form).bootstrapSwitch('state') == true) {
+                    data['event_save'] = 'repeat';
+                    data['event_repeat_days'] = Dl.Calendar.getDaysToRepeat(form);
+                    var rData = [];
+                    $.each($('#repeat-days-preview').dataTable().fnGetNodes(), function (key, value) {
+                        if ($(this).attr('data-repeat') == '1') {
+                            rData.push($(this).attr('data-date-repeat'));
+                        }
+                    });
+                    data['event_repeat_dates'] = rData;
+                } else {
+                    data['event_save'] = 'single';
+                }
+                Dl.Calendar.save(data, metadata);
+            },
+            save: function (data, metadata) {
+                $.ajax({
+                    url: "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'param1' => 'plugin', 'param2' => 'fullcalendar', 'param3' => 'saveevents')); ?>",
+                    type: "POST",
+                    async: true,
+                    dataType: "json",
+                    data: {
+                        settings: data,
+                        metadata: metadata
+                    },
+                    success: function (result) {
+
+                    },
+                    error: function () {
+                    }
+                });
+            },
+            registerHovers: function (calendar) {
+                var dwHover = function () {
+                    $('td.fc-widget-content', calendar).hover(
+                            function () {
+                                if ($(this).prev().hasClass('fc-time')) {
+                                    $(this)
+                                            .css('background-color', 'lightblue')
+                                            .css('cursor', 'pointer')
+                                }
+                            },
+                            function () {
+                                if ($(this).prev().hasClass('fc-time')) {
+                                    $(this)
+                                            .css('background-color', '')
+                                            .css('cursor', '')
+                                }
+                            }
+                    );
+                }();
+                var mHover = function () {
+                    $('td.fc-day', calendar).hover(
+                            function () {
+                                $(this)
+                                        .css('background-color', 'lightblue')
+                                        .css('cursor', 'pointer')
+                            },
+                            function () {
+                                $(this)
+                                        .css('background-color', '')
+                                        .css('cursor', '')
+                            }
+                    );
+                }();
+            },
+            registerMouseDUEffect: function (calendar) {
+                var dwDUEffect = function () {
+                    $('td.fc-widget-content', calendar).mousedown(
+                            function () {
+                                if ($(this).prev().hasClass('fc-time')) {
+                                    $(this)
+                                            .css('background-color', 'grey');
+                                }
+                            }
+                    );
+                    $('td.fc-widget-content', calendar).mouseup(
+                            function () {
+                                if ($(this).prev().hasClass('fc-time')) {
+                                    $(this)
+                                            .css('background-color', 'lightblue');
+                                }
+                            }
+                    );
+                }();
+                var mDUEffect = function () {
+                    $('td.fc-day', calendar).mousedown(function () {
+                        $(this)
+                                .css('background-color', 'grey');
+                    });
+                    $('td.fc-day', calendar).mouseup(function () {
+                        $(this)
+                                .css('background-color', 'lightblue');
+                    });
+                }();
+            },
+            dClick: function (date, event, view) {
+                if (view.name === 'month') {
+                    var dt = date.format("DD-MM-YYYY HH:mm");
+                    Dl.Calendar.amEventAdd(dt.replace(/00:00/g, moment(new Date()).format('HH:mm')));
+                } else if (view.name === 'agendaWeek' || view.name === 'agendaDay') {
+                    Dl.Calendar.awdEventAdd(date.format("DD-MM-YYYY HH:mm"));
+                } else {
+                    toastrMsg('', '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::$AvailablePluginAliasName, 'calendaraddeventerrortitle'); ?>', 'error');
+                    return false;
+                }
+            },
+            awdEventAdd: function (datetime) {
+                HelperFns.Calendar.Event.loadMainModal({
+                    's': '',
+                    'sD': datetime
+                })
+            },
+            amEventAdd: function (datetime) {
+                HelperFns.Calendar.Event.loadMainModal({
+                    's': '',
+                    'sD': datetime
+                })
+            },
+            makeDatatable: function (table) {
+                table.fadeIn(500);
+                table.dataTable({
+                    "language": {
+                        "aria": {
+                            "sortAscending": "",
+                            "sortDescending": ""
+                        },
+                        "emptyTable": "",
+                        "info": "Total: <span style='color: red'><strong> _TOTAL_ </strong></span> dates.",
+                        "infoEmpty": "",
+                        "infoFiltered": "",
+                        "lengthMenu": "Show _MENU_",
+                        "search": "",
+                        "zeroRecords": "",
+                        "paginate": {
+                            "previous": "Prev",
+                            "next": "Next"
+                        }
+                    },
+                    "columnDefs": [{
+                            "orderable": false,
+                            "searchable": false,
+                            "targets": [0, 1, 2]
+                        }],
+                    "lengthMenu": [
+                        [5, 10, 15],
+                        [5, 10, 15]
+                    ],
+                    "pageLength": 5,
+                    "sDom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "order": []
+                });
+                table.on('click', '.repeat-event-disable', function () {
+                    if ($(this).closest('tr').attr('data-repeat') == '1') {
+                        $(this)
+                                .removeClass('fa-minus-circle')
+                                .addClass('fa-undo')
+                                .attr('title', 'Undo')
+                                .closest('tr')
+                                .css('background-color', '#EF4836')
+                                .attr('data-repeat', '0')
+                                .find('.repeat-text')
+                                .text('NO');
+                    } else {
+                        $(this)
+                                .removeClass('fa-undo')
+                                .addClass('fa-minus-circle')
+                                .attr('title', 'Disable')
+                                .closest('tr')
+                                .css('background-color', '')
+                                .attr('data-repeat', '1')
+                                .find('.repeat-text')
+                                .text('YES');
+                    }
+                });
+            }, /* 18092016 START ALLAGES */
+            createTableForRepeatPreview: function (days) {
+                var tHead = '<thead>' +
+                        '<tr>' +
+                        '<th class="text-center" style="width: 50%;"> Date </th>' +
+                        '<th class="text-center" style="width: 25%;"> Repeat </th>' +
+                        '<th class="text-center" style="width: 25%;"> Remove </th>' +
+                        '</tr>' +
+                        '</thead>';
+                var tBody = '<tbody>';
+                $.each(days, function (key, value) {
+                    tBody += '<tr data-repeat="1" data-date-repeat="' + value + '">';
+                    tBody += '<td class="odd gradeX text-center repeat-date" style="width: 50%;">' + value + '</td>';
+                    tBody += '<td class="odd gradeX text-center repeat-text" style="width: 25%;">YES</td>';
+                    tBody += '<td class="odd gradeX text-center" style="width: 25%;"><a><i class="fa fa-minus-circle repeat-event-disable" title="Disable"></i></a></td>';
+                    tBody += '</tr>';
+                });
+                tBody += '</tbody>';
+                return {
+                    "table_html": '<table id="repeat-days-preview" class="table table-striped table-bordered table-hover table-checkable" style="display: none; width: 100%;">' + tHead + tBody + '</table>',
+                    "table_id": "repeat-days-preview"
+                }
+            },
+            createDaysForRepeatBySingle: function (dates) {
+                var days = [];
+                $.each(dates, function (key, value) {
+                    days.push(Dl.Gen.formatDate(value)['date']);
+                });
+                return days;
+            },
+            createDaysForRepeatByRange: function (weekdays, dates) {
+                var days = [];
+                $.each(dates, function (key, value) {
+                    if ($.inArray(value.getDay(), weekdays) != -1) {
+                        days.push(Dl.Gen.formatDate(value)['date']);
+                    }
+                });
+                return days;
+            },
+            getMultiSelectedDates: function (form) {
+                return $('[name="event_days_repeat_manual"]', form).datepicker("getDates");
+            },
+            getRangeDates: function (form) {
+                return {
+                    "from": $('[name="event_days_repeat_from"]', form).datepicker("getDate"),
+                    "to": $('[name="event_days_repeat_to"]', form).datepicker("getDate")
+                };
+            },
+            getDaysToRepeat: function (form) {
+                var days = [];
+                $('#buttons-group label', form).each(function () {
+                    if ($(this).hasClass('active')) {
+                        days.push(parseInt($(this).find('input').attr('data-day')));
+                    }
+                });
+                return days;
+            },
+            generateDaysToRepeatRange: function (form) {
+                var days = Dl.Calendar.getDaysToRepeat(form);
+                if ($.isEmptyObject(days)) {
+                    toastrMsg('', '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::$AvailablePluginAliasName, 'selectdaystorepeattitle'); ?>', 'error');
+                } else {
+                    var range = Dl.Calendar.getRangeDates(form);
+                    var dtfrom = Dl.Gen.formatDate(range.from, '/', true);
+                    var dtto = Dl.Gen.formatDate(range.to, '/', true);
+                    if (new Date(dtto.date) <= new Date(dtfrom.date)) {
+                        $('#repeat_container').empty();
+                        toastrMsg('', '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::$AvailablePluginAliasName, 'toishighορequalfromtitle'); ?>', 'error');
+                    } else {
+                        var selectedDates = Dl.Gen.generateDates(dtfrom.date, dtto.date);
+                        var finDays = Dl.Calendar.createDaysForRepeatByRange(days, selectedDates);
+                        var table = Dl.Calendar.createTableForRepeatPreview(finDays);
+                        $('#repeat_container').empty().append(table.table_html);
+                        $('#repeat_container').fadeIn(750);
+                        Dl.Calendar.makeDatatable($('#' + table.table_id));
+                    }
+                }
+            },
+            generateDaysToRepeatSingle: function (form) {
+                var selectedDates = Dl.Calendar.getMultiSelectedDates(form);
+                if ($.isEmptyObject(selectedDates)) {
+                    toastrMsg('', '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::$AvailablePluginAliasName, 'selectdatestorepeat'); ?>', 'error');
+                } else {
+                    var finDays = Dl.Calendar.createDaysForRepeatBySingle(selectedDates);
+                    var table = Dl.Calendar.createTableForRepeatPreview(finDays);
+                    $('#repeat_container').empty().append(table.table_html);
+                    $('#repeat_container').fadeIn(750);
+                    Dl.Calendar.makeDatatable($('#' + table.table_id));
+                }
+            },
+            initManualSelectionChange: function (form) {
+                $('[name="event_days_repeat_manual"]').off('changeDate').on('changeDate', function () {
+                    Dl.Calendar.generateDaysToRepeatSingle(form);
+                });
+            },
+            initRangeSelectionChange: function (form) {
+                $('[name="event_days_repeat_from"], [name="event_days_repeat_to"]').off('changeDate').on('changeDate', function () {
+                    Dl.Calendar.generateDaysToRepeatRange(form);
+                });
+            },
+            initStartEndTime: function (form) {
+                $('[name="event_start_time"], [name="event_end_time"]', form).timepicker({
+                    defaultTime: '',
+                    minuteStep: 15,
+                    showMeridian: '<?php echo $pluginarrparams['time_format'] == 12 ? true : false; ?>'
+                });
+            },
+            initStartEndChageTimeValidation: function (form) {
+                /*$('[name="event_start_time"], [name="event_end_time"]').change(function () {
+                 var startTime = $('[name="event_start_time"]', form).data("timepicker").getTime();
+                 var endTime = $('[name="event_end_time"]', form).data("timepicker").getTime();
+                 if (startTime > endTime) {
+                 $(this).val('');
+                 form.validate().element($(this));
+                 } else {
+                 form.validate().element($(this));
+                 }
+                 });*/
+            },
+            initSingleFromToDates: function (form, data) {
+                // TODO : bug , den douleuei to top placement gia to pou na emfanistei.
+                $("input[name='event_start_date'], input[name='event_end_date']", form).datepicker({
+                    autoclose: true,
+                    isRTL: App.isRTL(),
+                    todayBtn: false,
+                    showMeridian: '<?php echo $pluginarrparams['time_format'] == 12 ? true : false; ?>', // true = 12 Hour, false = 24 Hour
+                    format: '<?php echo $pluginarrparams['time_format'] == 12 ? 'dd-mm-yyyy' : 'dd-mm-yyyy'; ?>'//"dd-mm-yyyy HH:ii P"
+                });
+                if (data.s != 'now' && data.sD != '') {
+                    $('input[name="event_start_date"]', form).datepicker('update', data.sD);
+                } else {
+                    $('input[name="event_start_date"]', form).datepicker('update', new Date());
+                }
+            },
+            initFromToChageValidation: function (form) {
+                $('[name="event_start_date"], [name="event_end_date"]').change(function () {
+                    var dateTimeFrom = $('[name="event_start_date"]', form).datepicker("getDate");
+                    var dateTimeTo = $('[name="event_end_date"]', form).datepicker("getDate");
+                    if (dateTimeFrom > dateTimeTo) {
+                        $(this).val('');
+                        form.validate().element($(this));
+                    } else {
+                        form.validate().element($(this));
+                    }
+                });
+            },
+            initRangeFromToDates: function (form) {
+                Dl.Datepicker.initSingleDate($('[name="event_days_repeat_from"]', form));
+                Dl.Datepicker.initSingleDate($('[name="event_days_repeat_to"]', form));
+                Dl.Datepicker.setDate($('[name="event_days_repeat_from"]', form), moment().format());
+            },
+            initMultiDates: function (form) {
+                Dl.Datepicker.initMultiDate($('[name="event_days_repeat_manual"]', form));
+            },
+            clearDaysToRepetSelected: function (form) {
+                $('#buttons-group > label.btn', form).removeClass('active');
+            },
+            addValidatationStartEndDate: function (form) {
+                $('[name="event_start_date"], [name="event_end_date"]', form).removeClass('event-ignore-field');
+            },
+            removeValidatationStartEndDate: function (form) {
+                $('[name="event_start_date"], [name="event_end_date"]', form).addClass('event-ignore-field');
+            },
+            clearAllSelectedDates: function (form) {
+                Dl.Datepicker.setDate($('[name="event_days_repeat_from"]', form), '');
+                Dl.Datepicker.setDate($('[name="event_days_repeat_to"]', form), '');
+                Dl.Datepicker.setDate($('[name="event_days_repeat_manual"]', form), '');
+            },
+            clearPreviewTableContainer: function (form) {
+                $('#repeat_container', form).empty();
+            },
+            initDaysToRepeatSelectUpdate: function (form) {
+                $('#buttons-group > label.btn', form).on('click', function() {
+                    //Dl.Calendar.generateDaysToRepeatRange(form);
+                    Dl.Datepicker.setDate($('[name="event_days_repeat_to"]', form), '');
+                    Dl.Calendar.clearPreviewTableContainer(form);
+                });
+            },
+            initTypeSelection: function (form, time, data) {
+                time = time == '' || typeof time == 'undefined' ? 500 : time;
+                $('.repeat-type-selection', form).on('click', function () {
+                    var type = $(this).attr('name');
+                    if (type == 'single') {
+                        $('[name="event_days_repeat_from"], [name="event_days_repeat_to"], [name="event_days_repeat_to_days"], [name="event_days_repeat_manual"]', form).fadeOut(time - time);
+                        $('[name="event_single_event"]', form).fadeIn(time);
+                        Dl.Calendar.clearAllSelectedDates(form);
+                        Dl.Calendar.clearPreviewTableContainer(form);
+                        Dl.Calendar.clearDaysToRepetSelected(form);
+                        Dl.Calendar.addValidatationStartEndDate(form);
+                    } else if (type == 'range') {
+                        $('[name="event_single_event"], [name="event_days_repeat_manual"]', form).fadeOut(time - time);
+                        $('[name="event_days_repeat_from"], [name="event_days_repeat_to"], [name="event_days_repeat_to_days"]', form).fadeIn(time);
+                        Dl.Calendar.clearPreviewTableContainer(form);
+                        Dl.Calendar.removeValidatationStartEndDate(form);
+                        Dl.Datepicker.setDate($('[name="event_days_repeat_from"]', form), moment().format());
+                        Dl.Datepicker.setDate($('[name="event_days_repeat_to"]', form), '');
+                    } else if (type == 'manual') {
+                        $('[name="event_single_event"], [name="event_days_repeat_from"], [name="event_days_repeat_to"], [name="event_days_repeat_to_days"]', form).fadeOut(time - time);
+                        $('[name="event_days_repeat_manual"]', form).fadeIn(time);
+                        Dl.Calendar.clearAllSelectedDates(form);
+                        Dl.Calendar.clearPreviewTableContainer(form);
+                        Dl.Calendar.clearDaysToRepetSelected(form);
+                        Dl.Calendar.removeValidatationStartEndDate(form);
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            initFormFieldValidatiators: function (form) {
+                form.validate({
+                    errorElement: 'span', //default input error message container
+                    errorClass: 'help-block help-block-error', // default input error message class
+                    focusInvalid: false, // do not focus the last invalid input
+                    ignore: ".event-ignore-field", // validate all fields including form hidden input
+                    messages: {
+                        event_start_time: '<?php echo \B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('eventstarttimeerror'); ?>',
+                        event_end_time: '<?php echo \B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('eventendtimeerror'); ?>',
+                        event_subject: '<?php echo \B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('eventsubjecterror'); ?>',
+                        event_start_date: '<?php echo \B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('eventstarterror'); ?>',
+                        event_end_date: '<?php echo \B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('eventenderror'); ?>',
+                        event_status: '<?php echo \B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('eventstatus'); ?>'
+                    },
+                    rules: {
+                        event_start_time: {
+                            required: true
+                        },
+                        event_end_time: {
+                            required: true
+                        },
+                        event_stauts: {
+                            required: true
+                        },
+                        event_subject: {
+                            required: true
+                        },
+                        event_start_date: {
+                            required: true
+                        },
+                        event_end_date: {
+                            required: true
+                        }
+                    },
+                    // Sinartisis apo to plugin.
+                    highlight: function (element) { // hightlight error inputs
+                        $(element).closest('.form-group').addClass('has-error'); // set error class to the control group
+                    },
+                    unhighlight: function (element) { // revert the change done by hightlight
+                        $(element).closest('.form-group').removeClass('has-error'); // set error class to the control group
+                    },
+                    success: function (label) {
+                        label.closest('.form-group').removeClass('has-error'); // set success class to the control group
+                    },
+                    submitHandler: function (form) {
+                        Dl.Calendar.saveEvents(form);
+                    }
+                });
+            },
+            initMembersSelection: function (form) {
+            //alert('Will add onclick');
+                $('[name="event_members_search"]', form).off('click').on('click', function () {
+                    Dl.Calendar.addMembers();
+                });
+            },
+            initTrainersSelection: function (form) {
+                $('[name="event_trainers_search"]', form).off('click').on('click', function () {
+                    Dl.Calendar.addTrainers();
+                });
+            },
+            initMembersTags: function (form) {
+                $('[name="event_participant_members_tags"]', form).tagsinput({
+                    itemValue: 'id',
+                    itemText: 'text',
+                    freeInput: false
+                });
+            },
+            initTrainersTags: function (form) {
+                $('[name="event_participant_trainers_tags"]', form).tagsinput({
+                    itemValue: 'id',
+                    itemText: 'text',
+                    freeInput: false
+                });
+            },
+            InitForm: function (form, data) {
+                if (form == '' || $.isEmptyObject(form) || typeof form == 'undefined') {
+                    return false;
+                }
+                this.initStartEndTime(form);
+                //this.initStartEndTimeChageValidation(form);
+                this.initSingleFromToDates(form, data);
+                this.initFromToChageValidation(form);
+                this.initRangeFromToDates(form);
+                this.initMultiDates(form);
+                this.initTypeSelection(form, 750, data);
+                this.initMembersSelection(form);
+                this.initTrainersSelection(form);
+                this.initMembersTags(form);
+                this.initTrainersTags(form);
+                this.initManualSelectionChange(form);
+                this.initRangeSelectionChange(form);
+                this.initDaysToRepeatSelectUpdate(form);
+                this.initFormFieldValidatiators(form);
+                $('.bootstrap-tagsinput', form).css('display','block');
+            }
+        }
+        /* 18092016 END ALLAGES */
+    };
+//</script>

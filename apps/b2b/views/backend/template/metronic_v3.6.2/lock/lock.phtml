@@ -1,0 +1,39 @@
+<?php
+$di = \Phalcon\DI::getDefault();
+$assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path'];
+?>
+<?php $this->partial($di->controller_params_array['template']['template_view_dir']."lock/logo") ?>
+<div class="page-body">
+    <img class="page-lock-img" src="<?php echo $di->controller_params_array['custompath']; ?>images/users/<?php
+    $rowuser = json_decode(MyCustomHelperSession::My_get_param_val('jsonrowuser'), true);
+    echo $rowuser['id'];
+    ?>-profile.jpg"/>
+    <div class="page-lock-info">
+        <div class="alert alert-danger display-hide">
+            <button class="close" data-close="alert"></button>
+            <span>
+<?php echo $di->controller_params_array['form']['errmsg']; ?> </span>
+        </div>
+        <h1><?php echo $rowuser['displayname'] ?></h1>
+        <span class="email">
+<?php echo $rowuser['email'] ?> </span>
+        <span class="locked">
+            Locked </span>
+        <form class="form-inline" action="" method="post">
+            <input type="hidden" name='sessid' value="<?php echo $this->session->getId(); ?>"/>
+            <input type="hidden" placeholder="Username" name="username" value="<?php echo $rowuser['username'] ?>"/>
+            <div class="input-group input-medium">
+                <label class="control-label visible-ie8 visible-ie9">Password</label>
+                <input class="form-control" type="password" autocomplete="off" placeholder="Password" name="password"/>
+                <span class="input-group-btn">
+                    <button type="submit" class="btn blue icn-only"><i class="m-icon-swapright m-icon-white"></i></button>
+                </span>
+            </div>
+            <!-- /input-group -->
+            <div class="relogin">
+                <a href="<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_LOGIN); ?>">
+                    Not <?php echo $rowuser['displayname']; ?> ? </a>
+            </div>
+        </form>
+    </div>
+</div>

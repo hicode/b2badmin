@@ -1,0 +1,426 @@
+//<script>
+    /***
+     Wrapper/Helper Class for datagrid based on jQuery Datatable Plugin
+     ***/
+    var Datatable = function () {
+
+        var tableOptions; // main options
+        var dataTable; // datatable object
+        var table; // actual table jquery object
+        var tableContainer; // actual table container object
+        var tableWrapper; // actual table wrapper jquery object
+        var tableInitialized = false;
+        var ajaxParams = {}; // set filter mode
+        var the;
+        var countSelectedRecords = function () {
+            var selected = $('tbody > tr > td:nth-child(1) input[type="checkbox"]:checked', table).size();
+            var text = tableOptions.dataTable.language.metronicGroupActions;
+            if (selected > 0) {
+                $('.table-group-actions > span', tableWrapper).text(text.replace("_TOTAL_", selected));
+            } else {
+                $('.table-group-actions > span', tableWrapper).text("");
+            }
+        };
+        return {
+            //main function to initiate the module
+
+            init: function (options) {
+
+                if (!$().dataTable) {
+                    return;
+                }
+
+                the = this;
+                // default settings
+                options = $.extend(true, {
+                    src: "", // actual table  
+                    exporturlexcel: "", // url for export excel 
+                    exporturlopenofficecalc: "", // url for export open office calc
+                    exporturlpdf: "", // url for export pdf 
+                    exporturlcsv: "", // url for export csv 
+                    exporturlxml: "", // url for export xml
+                    filterApplyAction: "filter",
+                    filterCancelAction: "filter_cancel",
+                    resetGroupActionInputOnSuccess: true,
+                    loadingMessage: 'Loading...',
+                    dataTable: {
+                        "dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r><'table-scrollable't><'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>", // datatable layout
+                        //"dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r><'table-scrollable't><'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>", // datatable layout
+                        //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                        //"dom": "Bfrtip",
+                        "pageLength": 10, // default records per page
+                        "language": {// language settings
+                            // metronic spesific
+                            "metronicGroupActions": "_TOTAL_ records selected:  ",
+                            "metronicAjaxRequestGeneralError": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('CouldnotcompleterequestPleasecheckyourinternetconnection1'); ?>",
+                            // data tables spesific
+                            "lengthMenu": "<span class='seperator'>|</span><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('View1'); ?> _MENU_ <?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('records1'); ?>",
+                            "info": "<span class='seperator'>|</span><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Foundtotal1'); ?> _TOTAL_ <?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('records1'); ?>",
+                            "infoEmpty": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Norecordsfoundtoshow1'); ?>",
+                            "emptyTable": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Nodataavailableintable1'); ?>",
+                            "zeroRecords": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Nomatchingrecordsfound1'); ?>",
+                            "paginate": {
+                                "previous": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Prev1'); ?>",
+                                "next": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Next1'); ?>",
+                                "last": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Last1'); ?>",
+                                "first": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('First1'); ?>",
+                                "page": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Page1'); ?>",
+                                "pageOf": "<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('of1'); ?>"
+                            }
+                        },
+                        //buttons: [
+                        //{extend: 'print', className: 'btn dark btn-outline'},
+                        //{extend: 'copy', className: 'btn red btn-outline'},
+                        //{extend: 'pdf', className: 'btn blue btn-outline'},
+                        //{extend: 'excel', className: 'btn yellow btn-outline '},
+                        //{extend: 'csv', className: 'btn purple btn-outline '},
+                        //{extend: 'colvis', className: 'btn dark btn-outline', text: 'Columns'},
+                        //'copyHtml5',
+                        //'excelHtml5',
+                        //'csvHtml5',
+                        //'pdfHtml5',
+//                            {
+//                                extend: 'print',
+//                                customize: function (win) {
+//                                    $(win.document.body)
+//                                            .css('font-size', '8pt')
+//                                            .prepend(
+//                                                    '<img src="http://datatables.net/media/images/logo-fade.png" style="position:absolute; top:0; left:0;" />'
+//                                                    );
+//
+//                                    $(win.document.body).find('table')
+//                                            .addClass('compact')
+//                                            .css('font-size', 'inherit');
+//                                }
+//                            },
+//                            {
+//                                extend: 'pdf',
+//                                text: 'Save current page',
+//                                exportOptions: {
+//                                    modifier: {
+//                                        page: '10'
+//                                    },
+//                                    pageSize:'A4'
+//                                }
+//                            },
+//                            'pageLength'
+                        //],
+                        responsive: false,
+                        "orderCellsTop": true,
+                        "columnDefs": [{// define columns sorting options(by default all columns are sortable extept the first checkbox column)
+                                'orderable': false,
+                                'targets': [0]
+                            }],
+                        "pagingType": "bootstrap_extended", // pagination type(bootstrap, bootstrap_full_number or bootstrap_extended)
+                        "autoWidth": false, // disable fixed width and enable fluid table
+                        "processing": false, // enable/disable display message box on record load
+                        "serverSide": true, // enable/disable server side ajax loading
+
+                        "ajax": {// define ajax settings
+                            "url": "", // ajax URL
+                            "type": "POST", // request type
+                            "timeout": 20000,
+                            "data": function (data) { // add request parameters before submit
+                                $.each(ajaxParams, function (key, value) {
+                                    data[key] = value;
+                                });
+                                App.blockUI({
+                                    message: tableOptions.loadingMessage,
+                                    target: tableContainer,
+                                    overlayColor: 'none',
+                                    cenrerY: true,
+                                    boxed: true
+                                });
+                            },
+                            "dataSrc": function (res) { // Manipulate the data returned from the server
+                                if (res.customActionMessage) {
+                                    //Pan pan start for alert types 03/8/2015
+                                    var alerttype = 'danger';
+                                    var alerticon = 'danger';
+                                    if (res.customActionStatus == 'OK')
+                                    {
+                                        alerttype = 'success';
+                                        alerticon = 'check';
+                                    } else if (res.customActionStatus == 'WARNING')
+                                    {
+                                        alerttype = 'warning';
+                                        alerticon = 'warning';
+                                    }
+                                    toastrMsg('', res.customActionMessage, alerttype);
+                                    /*App.alert({
+                                     type: (alerttype),
+                                     icon: (alerticon),
+                                     message: res.customActionMessage,
+                                     container: tableWrapper,
+                                     place: 'prepend'
+                                     });*/
+                                    //Pan pan end for alert types 03/8/2015
+                                }
+
+                                if (res.customActionStatus) {
+                                    if (tableOptions.resetGroupActionInputOnSuccess) {
+                                        $('.table-group-action-input', tableWrapper).val("");
+                                    }
+                                }
+
+                                if ($('.group-checkable', table).size() === 1) {
+                                    $('.group-checkable', table).attr("checked", false);
+                                    $.uniform.update($('.group-checkable', table));
+                                }
+
+                                if (tableOptions.onSuccess) {
+                                    tableOptions.onSuccess.call(undefined, the);
+                                }
+
+                                App.unblockUI(tableContainer);
+                                return res.data;
+                            },
+                            "error": function () { // handle general connection errors
+                                if (tableOptions.onError) {
+                                    tableOptions.onError.call(undefined, the);
+                                }
+
+                                App.alert({
+                                    type: 'danger',
+                                    icon: 'warning',
+                                    message: tableOptions.dataTable.language.metronicAjaxRequestGeneralError,
+                                    container: tableWrapper,
+                                    place: 'prepend'
+                                });
+                                App.unblockUI(tableContainer);
+                            }
+                        },
+                        "drawCallback": function (oSettings) { // run some code on table redraw
+
+                            if (tableInitialized === false) { // check if table has been initialized
+                                tableInitialized = true; // set table initialized
+                                table.show(); // display table
+
+                            }
+                            App.initUniform($('input[type="checkbox"]', table)); // reinitialize uniform checkboxes on each table reload
+                            countSelectedRecords(); // reset selected records indicator
+
+                            // callback for ajax data load
+                            if (tableOptions.onDataLoad) {
+                                tableOptions.onDataLoad.call(undefined, the);
+                            }
+                        }
+                    }
+                }, options);
+                tableOptions = options;
+                // create table's jquery object
+                table = $(options.src);
+                //tableContainer = table.parents(".table-container");
+                tableContainer = table.closest(".table-container");
+                // apply the special class that used to restyle the default datatable
+                var tmp = $.fn.dataTableExt.oStdClasses;
+                $.fn.dataTableExt.oStdClasses.sWrapper = $.fn.dataTableExt.oStdClasses.sWrapper + " dataTables_extended_wrapper";
+                $.fn.dataTableExt.oStdClasses.sFilterInput = "form-control input-small input-sm input-inline";
+                $.fn.dataTableExt.oStdClasses.sLengthSelect = "form-control input-xsmall input-sm input-inline";
+                // initialize a datatable
+                dataTable = table.DataTable(options.dataTable);
+                // revert back to default
+                $.fn.dataTableExt.oStdClasses.sWrapper = tmp.sWrapper;
+                $.fn.dataTableExt.oStdClasses.sFilterInput = tmp.sFilterInput;
+                $.fn.dataTableExt.oStdClasses.sLengthSelect = tmp.sLengthSelect;
+                // get table wrapper
+                //tableWrapper = table.parents('.dataTables_wrapper');
+                tableWrapper = table.closest('.dataTables_wrapper');
+                // build table group actions panel
+                if ($('.table-actions-wrapper', tableContainer).size() === 1) {
+                    $('.table-group-actions', tableWrapper).html($('.table-actions-wrapper', tableContainer).html()); // place the panel inside the wrapper
+                    $('.table-actions-wrapper', tableContainer).remove(); // remove the template container
+                }
+                // handle group checkboxes check/uncheck
+                $('.group-checkable', table).change(function () {
+                    var set = $('tbody > tr > td:nth-child(1) input[type="checkbox"]', table);
+                    var checked = $(this).is(":checked");
+                    $(set).each(function () {
+                        $(this).attr("checked", checked);
+                    });
+                    $.uniform.update(set);
+                    countSelectedRecords();
+                });
+                // handle row's checkbox click
+                table.on('change', 'tbody > tr > td:nth-child(1) input[type="checkbox"]', function () {
+                    countSelectedRecords();
+                });
+                // handle filter submit button click
+
+                //Pan pan start for click to export datatable to excel 17/6/2015
+
+                $(".export-to-excel").click(function () {
+                    var tmpparams = dataTable.ajax.params();
+                    var dataurlexport = tableOptions.exporturlexcel;
+                    tmpparams["length"] = "<?php echo AGCHParams::$Static_Show_All; ?>";
+                    ExportDatatable(tmpparams, dataurlexport);
+                });
+
+                $(".export-to-open-office-calc").click(function () {
+                    var tmpparams = dataTable.ajax.params();
+                    var dataurlexport = tableOptions.exporturlopenofficecalc;
+                    tmpparams["length"] = "<?php echo AGCHParams::$Static_Show_All; ?>";
+                    ExportDatatable(tmpparams, dataurlexport);
+                });
+                //Pan pan end for click to export datatable to excel 17/6/2015
+
+                //Pan pan start for click to export datatable to pdf 17/6/2015
+
+                $(".export-to-pdf").click(function () {
+                    var tmpparams = dataTable.ajax.params();
+                    var dataurlexport = tableOptions.exporturlpdf;
+                    tmpparams["length"] = "<?php echo AGCHParams::$Static_Show_All; ?>";
+                    ExportDatatable(tmpparams, dataurlexport);
+                });
+                //Pan pan end for click to export datatable to pdf 17/6/2015
+
+                //Pan pan start for click to export datatable to csv 17/6/2015
+
+                $(".export-to-csv").click(function () {
+                    var tmpparams = dataTable.ajax.params();
+                    var dataurlexport = tableOptions.exporturlcsv;
+                    tmpparams["length"] = "<?php echo AGCHParams::$Static_Show_All; ?>";
+                    ExportDatatable(tmpparams, dataurlexport);
+                });
+                //Pan pan end for click to export datatable to csv 17/6/2015
+                //Pan pan start for click to search. Error with subgrid occured on search. Solved 19/5/2016
+                var table_searchbar = table.find("tr.filter").first();
+                var ctr = false;
+                table_searchbar.on('click', '.filter-submit', function (e) {
+                    e.preventDefault();
+                    the.submitFilter();
+                });
+                /*
+                 PPS20163002
+                 */
+
+
+
+
+                table_searchbar.on('change', '.form-filter', function (e) {
+                    e.preventDefault();
+                    the.submitFilter();
+                });
+
+//                table_searchbar.on('click', 'select.form-filter option', function (e) {
+//                    e.preventDefault();
+//                    the.submitFilter();
+//                });
+                /*
+                 PPE20163002
+                 */
+                //Pan pan end for click to search. Error with subgrid occured on search. Solved 19/5/2016
+                // handle filter cancel button click
+                table_searchbar.on('click', '.filter-cancel', function (e) {
+                    e.preventDefault();
+                    the.resetFilter();
+                });
+                //Pan pan start for change submit filter 21/3/2016
+                table_searchbar.on('paste', '.form-filter', function (e) {// ena lepto.......... 
+                    //alert('Paste is triggered, key='+e.which); // 18 =ctr
+                    //e.preventDefault();grafeis...
+                    //$(this).val($('#MyCustomClipboard').val());
+                    //alert($("input[name='search-customerlname']").val());
+                    //alert( window.getSelection().toString() ); // na se rwtiso
+
+                    setTimeout(function () {
+                        the.submitFilter();
+                    }, 250);
+
+                    //the.submitFilter();
+                });
+                table_searchbar.on('keydown', '.form-filter', function (e) {
+                    e.which == 17 ? ctr = true : '';
+                });
+                table_searchbar.on('keyup', '.form-filter', function (e) {
+                    /*if (ctr && e.which == 67) {
+                     $('#MyCustomClipboard').remove();
+                     table.after('<input id="MyCustomClipboard" class="hidden" value="'+ $(this).val() +'">');
+                     }
+                     else */if (!ctr) {
+                        //Pan pan start keyup search
+                        var validNumbers = [0, 186];
+                        if (validNumbers.indexOf(parseInt(e.which, 10)) >= 0) {
+                            //alert(e.which);
+                            return false;
+                        }
+                        e.preventDefault();
+                        the.submitFilter();
+                    }
+                    e.which == 17 ? ctr = false : '';
+                });
+            },
+            submitFilter: function () {
+                the.setAjaxParam("action", tableOptions.filterApplyAction);
+                // get all typeable inputs
+                $('textarea.form-filter, select.form-filter, input.form-filter:not([type="radio"],[type="checkbox"])', table).each(function () {
+                    the.setAjaxParam($(this).attr("name"), $(this).val());
+                });
+                // get all checkboxes
+                $('input.form-filter[type="checkbox"]:checked', table).each(function () {
+                    the.addAjaxParam($(this).attr("name"), $(this).val());
+                });
+                // get all radio buttons
+                $('input.form-filter[type="radio"]:checked', table).each(function () {
+                    the.setAjaxParam($(this).attr("name"), $(this).val());
+                });
+                dataTable.ajax.reload();
+            },
+            resetFilter: function () {
+                $('textarea.form-filter, select.form-filter, input.form-filter', table).each(function () {
+                    $(this).val("");
+                });
+                $('input.form-filter[type="checkbox"]', table).each(function () {
+                    $(this).attr("checked", false);
+                });
+                the.clearAjaxParams();
+                the.addAjaxParam("action", tableOptions.filterCancelAction);
+                dataTable.ajax.reload();
+            },
+            getSelectedRowsCount: function () {
+                return $('tbody > tr > td:nth-child(1) input[type="checkbox"]:checked', table).size();
+            },
+            getSelectedRows: function () {
+                var rows = [];
+                $('tbody > tr > td:nth-child(1) input[type="checkbox"]:checked', table).each(function () {
+                    rows.push($(this).val());
+                });
+                return rows;
+            },
+            setAjaxParam: function (name, value) {
+                ajaxParams[name] = value;
+            },
+            addAjaxParam: function (name, value) {
+                if (!ajaxParams[name]) {
+                    ajaxParams[name] = [];
+                }
+
+                skip = false;
+                for (var i = 0; i < (ajaxParams[name]).length; i++) { // check for duplicates
+                    if (ajaxParams[name][i] === value) {
+                        skip = true;
+                    }
+                }
+
+                if (skip === false) {
+                    ajaxParams[name].push(value);
+                }
+            },
+            clearAjaxParams: function (name, value) {
+                ajaxParams = {};
+            },
+            getDataTable: function () {
+                return dataTable;
+            },
+            getTableWrapper: function () {
+                return tableWrapper;
+            },
+            gettableContainer: function () {
+                return tableContainer;
+            },
+            getTable: function () {
+                return table;
+            }
+        };
+    };
+//</script>

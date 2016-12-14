@@ -1,0 +1,2 @@
+bash /home/panosp/NetBeansProjects/phalconphp/data/ScriptsFromBash/phalcon_ppschema_ppuser/erp/erp_scripts_table_data.bash /home/panosp/NetBeansProjects/phalconphp/data/ScriptsFromBash/phalcon_ppschema_ppuser/settings_devel.bash 
+psql -U postgres -W -c "select ppschema.mvupdatedeallpendends();"

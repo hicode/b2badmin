@@ -1,0 +1,42 @@
+<div class="login-options">
+    <h4>Or login with</h4>
+    <ul class="social-icons">
+        <?php
+        if ($di->controller_params_array['template']['template_admin_login_social_facebook'] == true) {
+            ?>
+        <li>
+            <a class="social-icon-color facebook" data-original-title="facebook" href="#"></a>
+        </li>
+        <?php
+        }
+        ?>
+        <?php
+        if ($di->controller_params_array['template']['template_admin_login_social_twitter'] == true) {
+            ?>
+        <li>
+            <a class="social-icon-color twitter" data-original-title="Twitter" href="#"></a>
+        </li>
+        <?php
+        }
+        ?>
+        <?php
+        if ($di->controller_params_array['template']['template_admin_login_social_google'] == true) {
+            ?>
+        <li>
+            <a class="social-icon-color googleplus" data-original-title="Goole Plus" href="#"></a>
+        </li>
+        <?php
+        }
+        ?>
+        <?php
+        if ($di->controller_params_array['template']['template_admin_login_social_linkedin'] == true) {
+            ?>
+        <li>
+            <a class="social-icon-color linkedin" data-original-title="Linkedin" href="#"></a>
+        </li>
+        <?php
+        }
+        ?>
+        
+    </ul>
+</div>

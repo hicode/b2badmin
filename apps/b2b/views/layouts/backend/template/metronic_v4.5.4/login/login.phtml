@@ -1,0 +1,252 @@
+<?php
+$di = Phalcon\DI::getDefault();
+?>
+<?php echo $this->tag->getDoctype(); ?>
+<?php $this->partial($di->controller_params_array['template']['template_view_dir'] . "license") ?>
+<?php
+$assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path'];
+$layoutspath = $assetspath . 'layouts/';
+$globalpath = $assetspath . 'global/';
+$pluginspath = $globalpath . 'plugins/';
+$template_admin_name = $di->controller_params_array['template']['template_admin_name'];
+?>
+
+<!--[if IE 8]> <html lang="en" class="ie8 no-js" data-ng-app="MetronicApp"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js" data-ng-app="MetronicApp"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en" data-ng-app="MetronicApp">
+    <!--<![endif]-->
+    <!-- BEGIN HEAD -->
+    <head>
+        <base href="<?php echo $di->controller_params_array['html_base_path']; ?>">
+        <title><?php echo $di->controller_params_array['settings']['site_title']; ?> - Log in</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <meta content="" name="description"/>
+        <meta content="" name="author"/>
+
+        <!-- BEGIN GLOBAL MANDATORY STYLES -->
+
+
+
+
+
+        <!--<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css"/>-->
+
+
+
+        <?php
+        $collectionname = 'cssLoginGlobal' . $template_admin_name;
+        $objcsscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            1 => array(
+                'path' => 'custom/css/',
+                'filename' => 'customfirst.css'
+            ),
+            5 => array(
+                'remoteurl' => 'http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all'
+            ),
+            10 => array(
+                'path' => $assetspath . 'global/plugins/font-awesome/css/',
+                'filename' => 'font-awesome.css'
+            ),
+            20 => array(
+                'path' => $assetspath . 'global/plugins/simple-line-icons/',
+                'filename' => 'simple-line-icons.css'
+            ),
+            30 => array(
+                'path' => $assetspath . 'global/plugins/bootstrap/css/',
+                'filename' => 'bootstrap.css'
+            ),
+            40 => array(
+                'path' => $assetspath . 'global/plugins/uniform/css/',
+                'filename' => 'uniform.default.css'
+            ),
+            50 => array(
+                'path' => $pluginspath . 'bootstrap-toastr/',
+                'filename' => 'toastr.min.css'
+            ),
+            60 => array(
+                'path' => $assetspath . 'pages/css/',
+                'filename' => 'login.css'
+            )
+        );
+
+        echo MyTags::MyCollectionCssGenerate($arr, $collectionname);
+        ?>
+
+        <!-- END GLOBAL MANDATORY STYLES -->
+
+        <!-- BEGIN DYMANICLY LOADED CSS FILES(all plugin and page related styles must be loaded between GLOBAL and THEME css files ) -->
+
+        <!-- END DYMANICLY LOADED CSS FILES -->
+
+        <!-- BEGIN THEME STYLES -->
+        <!-- DOC: To use 'rounded corners' style just load 'components-rounded.css' stylesheet instead of 'components.css' in the below style tag -->
+
+
+        <?php
+        $collectionname = 'cssTheme' . $template_admin_name . $di->controller_params_array['template']['template_admin_theme'] . $di->controller_params_array['template']['template_admin_theme_color'];
+        $objcsscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            2 => array(
+                'path' => $assetspath . 'global/plugins/select2/css/',
+                'filename' => 'select2.min.css'
+            ),
+            4 => array(
+                'path' => $assetspath . 'global/plugins/select2/css/',
+                'filename' => 'select2-bootstrap.min.css'
+            ),
+            10 => array(
+                'path' => $assetspath . 'global/css/',
+                'filename' => 'components.css'
+            ),
+            20 => array(
+                'path' => $assetspath . 'global/css/',
+                'filename' => 'plugins.css'
+            ),
+            30 => array(
+                'path' => $assetspath . 'layouts/layout/css/',
+                'filename' => 'layout.css'
+            ),
+            40 => array(
+                'path' => $assetspath . 'layouts/layout/css/themes/',
+                'filename' => $di->controller_params_array['template']['template_admin_theme_color'] . '.css'
+            ),
+            50 => array(
+                'path' => $assetspath . 'layouts/layout/css/',
+                'filename' => 'custom.css'
+            )
+        );
+
+        echo MyTags::MyCollectionCssGenerate($arr, $collectionname);
+        ?>
+        <!-- END THEME STYLES -->
+
+        <link rel="shortcut icon" href="favicon.ico"/>
+    </head>
+    <!-- END HEAD -->
+
+
+    <!-- BEGIN BODY -->
+    <body class="login">
+
+        <?php echo $this->getContent() ?>
+        <div class="copyright">
+            <?php $this->partial($di->controller_params_array['template']['template_view_dir'] . "login/footer") ?>
+        </div>
+
+        <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+
+        <!-- BEGIN CORE JQUERY PLUGINS -->
+        <!--[if lt IE 9]>
+        <script src="../../../assets/global/plugins/respond.min.js"></script>
+        <script src="../../../assets/global/plugins/excanvas.min.js"></script> 
+        <![endif]
+        -->
+        <?php
+        $collectionname = 'jsLoginJqueryCorePlugins' . $template_admin_name;
+        $objjscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            0 => array('partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/", 'partialviewname' => 'js-custom-first'),
+            //0 => array(
+            //    'localurl' => '/b2b/' . $di->controller_params_array['lng'] . '/admin/dynhelperpage/js-custom-first/1.js',
+            //),
+            2 => array(
+                'path' => $assetspath . 'global/plugins/',
+                'filename' => 'jquery.min.js'
+            ),
+            10 => array(
+                'path' => 'custom/js/',
+                'filename' => 'customfirst.js'
+            ),
+            20 => array(
+                'path' => $assetspath . 'global/plugins/',
+                'filename' => 'jquery-migrate.min.js'
+            ),
+            30 => array(
+                'path' => $assetspath . 'global/plugins/jquery-ui/',
+                'filename' => 'jquery-ui.min.js'
+            ),
+            40 => array(
+                'path' => $assetspath . 'global/plugins/bootstrap/js/',
+                'filename' => 'bootstrap.min.js'
+            ),
+            50 => array(
+                'path' => $assetspath . 'global/plugins/',
+                'filename' => 'jquery.blockui.min.js'
+            ),
+            60 => array(
+                'path' => $assetspath . 'global/plugins/',
+                'filename' => 'jquery.cokie.min.js'
+            ),
+            70 => array(
+                'path' => $assetspath . 'global/plugins/uniform/',
+                'filename' => 'jquery.uniform.min.js'
+            ),
+            72 => array(
+                'path' => $pluginspath . 'bootstrap-toastr/',
+                'filename' => 'toastr.min.js'
+            ),
+            75 => array(
+                'path' => $assetspath . 'global/plugins/select2/js/',
+                'filename' => 'select2.full.min.js'
+            ),
+            80 => array(
+                'path' => $assetspath . 'global/plugins/jquery-validation/js/',
+                'filename' => 'jquery.validate.min.js'
+            ),
+            //90 => array(
+            //    'path' => $assetspath . 'global/scripts/',
+            //    'filename' => 'metronic.js'
+            //),
+            //93 => array(
+            //    'path' => $assetspath . 'layouts/layout/scripts/',
+            //    'filename' => 'layout.js'
+            //),
+            //95 => array(
+            //    'path' => $assetspath . 'admin/layout/scripts/',
+            //    'filename' => 'demo.js'
+            //),
+            96 => array('partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/", 'partialviewname' => 'js-app'),
+            97 => array('partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/", 'partialviewname' => 'js-login'),
+            99 => array(
+                'path' => 'custom/js/',
+                'filename' => 'customend.js'
+            )
+        );
+
+        echo MyTags::MyCollectionJsGenerate($arr, $collectionname);
+        ?>
+
+        <script>
+            jQuery(document).ready(function () {
+                App.init(); // init metronic core components
+                //Layout.init(); // init current layout
+                //Login.init();
+                //Demo.init();
+            });
+<?php
+if ($di->controller_params_array['form']['showerrmsg'] == 1) {
+    ?>
+                $('.alert-danger', $('.login-form')).show();
+    <?php
+}
+?>
+        </script>
+
+
+
+        <!-- END JAVASCRIPTS -->
+
+
+
+    </body>
+    <!-- END BODY -->
+</html>
+
+

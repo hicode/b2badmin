@@ -1,0 +1,204 @@
+//Pan Pan start fix confirmation  11/06/2015 
+<?php
+$di = Phalcon\DI::getDefault();
+?>
+<?php
+$prefixconfirmationbtn = $di->controller_params_array['settings']['My_Prefix_Confirmation_Btn'];
+$requrl_async_base = MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Async'])); //  '/'.$di->controller_params_array['lng'].'/b2b/admin/dynhelperpage/'.AGCHParams::$Settings_Helper_Page_Async_2.'/';
+$requrl_post_base = MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'])); //'/b2b/' . $di->controller_params_array['lng'] . '/admin/dynhelperpage/' . AGCHParams::$Settings_Helper_Page_Posts_2 . '/';
+$bltrue = AGCHParams::$Static_Bl_True;
+$blfalse = AGCHParams::$Static_Bl_False;
+?>
+var handleBootstrapConfirmationOnce = function () {
+
+$("[id^=<?php echo $prefixconfirmationbtn; ?>]").unbind('confirmed.bs.confirmation');
+$("[id^=<?php echo $prefixconfirmationbtn; ?>]").on('confirmed.bs.confirmation', function () {
+handleActionConfirmation(this, "<?php echo $di->controller_params_array['settings']['My_Confirm_Result_Button_Yes']; ?>");    
+});
+$("[id^=<?php echo $prefixconfirmationbtn; ?>]").unbind('canceled.bs.confirmation');
+$("[id^=<?php echo $prefixconfirmationbtn; ?>]").on('canceled.bs.confirmation', function () {
+handleActionConfirmation(this, "<?php echo $di->controller_params_array['settings']['My_Confirm_Result_Button_No']; ?>");
+});
+}
+
+var handleBootstrapConfirmation = function () {
+//alert($().confirmation);
+if (!$().confirmation) {
+//alert("1");
+return;
+}
+//alert("2");
+
+handleBootstrapConfirmationOnce();
+$("[id^=confirmation]").confirmation("hide");
+$('[data-toggle=confirmation]').confirmation({container: 'body', btnOkClass: 'btn-xs btn-success', btnCancelClass: 'btn-xs btn-danger'});
+}
+
+var handleActionConfirmation = function (obj, myconfirmresultbutton){
+var mydataaction = $(obj).attr( "<?php echo $di->controller_params_array['settings']['My_Data_Field_Attr_Action']; ?>" );
+var mydataid = $(obj).attr( "<?php echo $di->controller_params_array['settings']['My_Data_Field_Attr_Id']; ?>" );
+var mydatamode = $(obj).attr( "<?php echo $di->controller_params_array['settings']['My_Data_Field_Attr_Mode']; ?>" );
+var myidmatch = "<?php echo $prefixconfirmationbtn; ?>"+mydataid;
+var requrl = "<?php echo $requrl_post_base; ?>" + mydataaction + "/" + mydatamode + "/" + mydataid + "/";
+var blexecajax = false;
+var msg_success = "The operation has completed successfully";
+var msg_no_success = "Error during operation";
+
+if(obj.id===myidmatch)
+{
+if(mydataaction==="<?php echo $di->controller_params_array['settings']['Action_Del']; ?>" ||
+mydataaction==="<?php echo $di->controller_params_array['settings']['Action_Disable']; ?>"
+)
+{
+if(myconfirmresultbutton==="<?php echo $di->controller_params_array['settings']['My_Confirm_Result_Button_Yes']; ?>")
+{
+if(mydatamode==="<?php echo $di->controller_params_array['settings']['Param2_Static_Translates']; ?>")
+{
+blexecajax = true;
+msg_no_success = "Error during record delete.";
+}
+}
+}
+}
+if(blexecajax===true)
+{
+$.ajax({
+url: requrl,
+async:   false,
+dataType: "json"
+}).done(function(data) { 
+if(data.success===<?php echo $bltrue; ?>)
+{
+<?php
+$metronic_alert_arr_params = MyCustomHelperTemplate::Get_Metronic_Alert_Default_Arr_Params_Success_Yes();
+$metronic_alert_arr_params['message'] = 'msg_success';
+$metronic_alert_arr_params['reset'] = '1';
+$metronic_alert_arr_params['closeInSeconds'] = '5';
+echo MyCustomHelperTemplate::Get_Metronic_Alert($metronic_alert_arr_params)
+?>
+ret = true;                    
+executeIfFunctionExist('MyModalOnClose');
+}
+else
+{
+<?php
+$metronic_alert_arr_params = MyCustomHelperTemplate::Get_Metronic_Alert_Default_Arr_Params_Success_No();
+$metronic_alert_arr_params['message'] = 'msg_no_success';
+$metronic_alert_arr_params['reset'] = '1';
+$metronic_alert_arr_params['closeInSeconds'] = '5';
+echo MyCustomHelperTemplate::Get_Metronic_Alert($metronic_alert_arr_params)
+?>
+ret = false;
+}
+});
+}
+else
+{
+msg_success = "The operation has been canceled successfully!!!";
+<?php
+$metronic_alert_arr_params = MyCustomHelperTemplate::Get_Metronic_Alert_Default_Arr_Params_Success_Yes();
+$metronic_alert_arr_params['message'] = 'msg_success';
+$metronic_alert_arr_params['reset'] = '1';
+$metronic_alert_arr_params['closeInSeconds'] = '5';
+
+echo MyCustomHelperTemplate::Get_Metronic_Alert($metronic_alert_arr_params)
+?>
+}
+}
+//Pan Pan end fix confirmation  11/06/2015
+
+function Form1Click()
+{
+<?php
+$requrl = $requrl_async_base . $di->controller_params_array['settings']['Param1_Async_Static_Translates_Exist'] . '/"+aliasname+"/';
+$minlength = CHCrmCParams::My_get_field_params('static_translate_alias', 'min_length');
+?>
+$(".formclick").click(function(){
+var ret=true; 
+var aliasname=$("#id1").val();
+var msg="";
+aliasname=aliasname.replace(/[^a-z0-9\-]/ig,"");
+var requrl = "<?php echo $requrl; ?>";
+$("#bootstrap_alert").text("");
+if(aliasname!=$("#id1").val())
+{
+ret=false;
+<?php
+$metronic_alert_arr_params = MyCustomHelperTemplate::Get_Metronic_Alert_Default_Arr_Params_Success_No();
+$metronic_alert_arr_params['message'] = '"Invalid characters detected. <br> Allowed characters <br>a w <br> 0 9 <br>-"';
+echo MyCustomHelperTemplate::Get_Metronic_Alert($metronic_alert_arr_params)
+?>
+
+}
+if(aliasname.length<<?php echo $minlength; ?>)  
+{
+ret=false;
+<?php
+$metronic_alert_arr_params = MyCustomHelperTemplate::Get_Metronic_Alert_Default_Arr_Params_Success_No();
+$metronic_alert_arr_params['message'] = '"Min length detected. <br>Allowed min length ' . $minlength . ' characters."';
+echo MyCustomHelperTemplate::Get_Metronic_Alert($metronic_alert_arr_params)
+?>
+
+
+}
+if(ret==true)
+{
+
+$("#okid").attr("href", $("#hidden1").val()+aliasname+"/");
+
+$.ajax({
+url: requrl,
+async:   false
+}).done(function(data) {  
+if(data==="<?php echo $bltrue; ?>")
+{
+
+<?php
+$metronic_alert_arr_params = MyCustomHelperTemplate::Get_Metronic_Alert_Default_Arr_Params_Success_No();
+$metronic_alert_arr_params['message'] = '"Alias name already exist. Please try another alias name."';
+echo MyCustomHelperTemplate::Get_Metronic_Alert($metronic_alert_arr_params)
+?>
+
+ret=false;
+}
+});
+}
+return ret;
+});
+}
+
+//Pan pan start for function to export datatable to excel 17/6/2015
+
+function ExportDatatable(ajaxParams, dataurlexport)
+{
+var args = $.param(ajaxParams);
+$.redirectPost(dataurlexport, args);
+
+/*var requrl = 'http://phalconphp.com.local/en/b2b/admin/dynhelperpage/data-table-ajax/inner_home_settings_static_translates/';
+
+$.ajax({
+url: requrl,
+async:   false,
+"type": "POST", // request type
+"timeout": 20000,
+"data": ajaxParams,
+}).done(function(data) { 
+var args = $.param(ajaxParams);
+$.redirectPost(dataurlexport, args);
+
+//window.open('/en/b2b/admin/dynhelperpage/data-table-ajax/inner_home_settings_static_translates/?'+ajaxParams);
+});*/
+
+}
+
+//Pan pan end for function to export datatable to excel 17/6/2015
+function changelockurl()
+{
+var lockurl="<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_LOCK); ?>?prevpage="+encodeURIComponent(window.location.href);
+$( ".lock-user" ).attr("href", lockurl);
+}
+
+function runeveryinner()
+{
+changelockurl();
+}

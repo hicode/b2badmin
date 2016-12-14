@@ -1,0 +1,7 @@
+INSERT INTO core_available_codes(myowner, mycode, mytype, mypage, mymethod,remarks) VALUES ('pp','10000','custom','PpB2bAdminMetronic454PluginDataTableAjax.phtml','Insert_Data()','Settings or metadata are not correct.');
+INSERT INTO core_available_codes(myowner, mycode, mytype, mypage, mymethod,remarks) VALUES ('pp','10010','custom','PpB2bAdminMetronic454PluginDataTableAjax.phtml','Insert_Data()','Metadata(Id) is null');
+INSERT INTO core_available_codes(myowner, mycode, mytype, mypage, mymethod,remarks) VALUES ('pp','10020','custom','PpB2bAdminMetronic454PluginDataTableAjax.phtml','Insert_Data()','$arrparams[$keyarr] is null');
+INSERT INTO core_available_codes(myowner, mycode, mytype, mypage, mymethod,remarks) VALUES ('pp','10030','custom','PpB2bAdminMetronic454PluginDataTableAjax.phtml','Insert_Data()','Critical error occurred during checking for param :');
+INSERT INTO core_available_codes(myowner, mycode, mytype, mypage, mymethod,remarks) VALUES ('pp','10040','custom','PpB2bAdminMetronic454PluginDataTableAjax.phtml','Insert_Data()','Critical error occurred during saving settings for resource :');
+INSERT INTO core_available_codes(myowner, mycode, mytype, mypage, mymethod,remarks) VALUES ('pp','10050','custom','PpB2bAdminMetronic454PluginDataTableAjax.phtml','Insert_Data()','Critical error occurred during saving param :');
+INSERT INTO core_available_codes(myowner, mycode, mytype, mypage, mymethod,remarks) VALUES ('pp','10060','custom','PpB2bAdminMetronic454PluginDataTableAjax.phtml','Insert_Data()','The operation has completed succesfully');

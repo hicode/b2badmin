@@ -1,0 +1,36 @@
+SQLCOMMAND="CREATE EXTENSION pgcrypto;";
+bash "$ppexecpsqlcmdNodb" "$SQLCOMMAND"
+
+
+SQLCOMMAND="CREATE ROLE "$MYDBUSER" LOGIN PASSWORD '"$MYDBPASS"' NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;";
+bash "$ppexecpsqlcmdNodb" "$SQLCOMMAND"
+
+SQLCOMMAND="ALTER USER "$MYDBUSER" WITH PASSWORD '"$MYDBPASS"';";
+bash "$ppexecpsqlcmdNodb" "$SQLCOMMAND"
+
+SQLCOMMAND="CREATE DATABASE "$MYDB" WITH OWNER = "$MYDBUSER" ENCODING = 'UTF8' TABLESPACE = pg_default LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8' CONNECTION LIMIT = -1;";
+bash "$ppexecpsqlcmdNodb" "$SQLCOMMAND"
+
+SQLCOMMAND="CREATE EXTENSION dblink;";
+bash "$ppexecpsqlcmd" "$SQLCOMMAND"
+
+if [ "$MYRECREATESCHEMA" = "1" ]; then
+
+    SQLCOMMAND="DROP SCHEMA IF EXISTS "$MYSCHEMA" CASCADE;";
+    bash "$ppexecpsqlcmd" "$SQLCOMMAND"
+fi
+
+SQLCOMMAND="CREATE SCHEMA IF NOT EXISTS "$MYSCHEMA";";
+bash "$ppexecpsqlcmd" "$SQLCOMMAND"
+
+SQLCOMMAND="CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;";
+bash "$ppexecpsqlcmd" "$SQLCOMMAND"
+
+SQLCOMMAND="COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';";
+bash "$ppexecpsqlcmd" "$SQLCOMMAND"
+
+SQLCOMMAND="CREATE ROLE ppb2badminusr LOGIN PASSWORD 'ppb2badminusr1975' SUPERUSER NOINHERIT VALID UNTIL 'infinity';";
+bash "$ppexecpsqlcmd" "$SQLCOMMAND"
+
+SQLCOMMAND="ALTER USER ppb2badminusr WITH PASSWORD 'ppb2badminusr1975';";
+bash "$ppexecpsqlcmd" "$SQLCOMMAND"

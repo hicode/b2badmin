@@ -1,0 +1,2 @@
+rsync -arvz --exclude 'data/Apps' --exclude 'nbproject' /home/panosp/NetBeansProjects/gym/ root@telecon-vps1:/usr/share/pp/gym/  
+ssh root@telecon-vps1 'bash /usr/share/pp/gym/data/ScriptsFromBash/gym_ppschema_ppuser/b2badminbasescript_live.bash'

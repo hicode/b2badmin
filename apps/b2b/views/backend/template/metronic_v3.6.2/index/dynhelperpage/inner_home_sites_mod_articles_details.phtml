@@ -1,0 +1,87 @@
+<?php
+$di = \Phalcon\DI::getDefault();
+$assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path'];
+?>
+<!-- BEGIN PAGE HEADER-->
+<?php
+echo Metronic362CCustomHelperAjax::get_div_ajax_small_stack1();
+echo Metronic362CCustomHelperAjax::get_div_ajax_full();
+?>
+<?php
+
+
+echo Metronic362CCustomHelperInnerPageHelperHeader::Get_Page_Header();
+?>
+
+<!-- END PAGE HEADER-->
+<!-- BEGIN MAIN CONTENT -->
+<?php
+echo Metronic362CCustomHelperInnerPageHelperDataTableAjax::Get_Page_DataTableAjax();
+?>
+
+<!-- END MAIN CONTENT -->
+
+<!-- BEGIN PAGE LEVEL PLUGINS 
+<script src="/<?php echo $assetspath; ?>global/plugins/bootstrap-confirmation/bootstrap-confirmation.min.js" type="text/javascript"></script>-->
+<!-- END MAIN JS -->
+<script type="text/javascript">
+    runeveryinner();
+    var MyModalInitPage = function () {
+        Form1Click();
+    }
+    var MyModalOnClose = function () {
+        //alert('close');
+        grid.getDataTable().ajax.reload();
+    }
+    /*myaoColumns = [{ "sTitle": "<input type=\"checkbox\" class=\"group-checkable\">",  "sClass": "center", "sWidth": "2%" },
+     { "sTitle": "Seq#",  "sClass": "center", "sWidth": "1%" },
+     { "sTitle": "English<br>Translation",  "sClass": "center", "sWidth": "1%" },
+     { "sTitle": "Update<br>Status",  "sClass": "center", "sWidth": "1%" },
+     { "sTitle": "Title",  "sClass": "left", "sWidth": "7%" },
+     { "sTitle": "Published",  "sClass": "center", "sWidth": "1%" },
+     { "sTitle": "Video",  "sClass": "center", "sWidth": "1%" },
+     { "sTitle": "Last<br>News",  "sClass": "center", "sWidth": "1%" },
+     { "sTitle": "Endiaferonta",  "sClass": "center", "sWidth": "1%" },
+     { "sTitle": "Drastirotites<br>Dnseon",  "sClass": "center", "sWidth": "20%" },
+     { "sTitle": "Cal<br>Events",  "sClass": "center", "sWidth": "1%" },
+     { "sTitle": "Creator",  "sClass": "center", "sWidth": "7%" },
+     { "sTitle": "Dt<br>Modified",  "sClass": "left", "sWidth": "7%" },
+     { "sTitle": "Alias",  "sClass": "left", "sWidth": "7%" },
+     { "sTitle": "Trashed",  "sClass": "center", "sWidth": "7%" },
+     { "sTitle": "Id",  "sClass": "left", "sWidth": "7%" },
+     { "sTitle": "Idstr",  "sClass": "left", "sWidth": "7%" },
+     { "sTitle": "Actions",  "sClass": "left", "sWidth": "1%" }];*/
+    myaoColumns = <?php echo $di->controller_params_array[CHCrmCParams::$keyarrDataTableAjax]['myaoColumns']; ?>;
+    /*myaoColumns=[
+     { "sTitle": "<input type=\"checkbox\" class=\"group-checkable\">", "sClass": "center", "sWidth": "200px"  },
+     { "sTitle": "Customer Name", "sClass": "center", "sWidth": "1600px" },
+     { "sTitle": "Phone Number" , "sClass": "center", "sWidth": "600px" },
+     { "sTitle": "Avg Volume($ amount)", "sClass": "center", "sWidth": "600px" },
+     { "sTitle": "GPO Contract Name/#",  "sClass": "center", "sWidth": "600px" }
+     ];*/
+    /* myaoColumns1={};*/
+    TableAjax.init();
+    //grid.aoColumns= [
+    //     { "sClass": "center", "sWidth": "200px"  },
+    //     { "sClass": "center", "sWidth": "1600px" },
+    //     { "sTitle": "Phone Number" , "sClass": "center", "sWidth": "600px" },
+    //     { "sTitle": "Avg Volume($ amount)", "sClass": "center", "sWidth": "600px" },
+    //     { "sTitle": "GPO Contract Name/#",  "sClass": "center", "sWidth": "600px" }
+//];
+//grid.init();
+//grid.getDataTable().ajax.reload();
+    //var oListSettings = grid.getDataTable().fnSettings();
+    //oListSettings.aoColumns=[
+    //       { "sClass": "center", "sWidth": "200px"  },
+    //       { "sClass": "center", "sWidth": "1600px" },
+    //       { "sTitle": "Phone Number" , "sClass": "center", "sWidth": "600px" },
+    //       { "sTitle": "Avg Volume($ amount)", "sClass": "center", "sWidth": "600px" },
+    //       { "sTitle": "GPO Contract Name/#",  "sClass": "center", "sWidth": "600px" }
+//];
+    //grid.getDataTable().fnReloadAjax();
+    //grid.fnReloadAjax();
+    //grid.fnFilterOnReturn();
+
+    //handleBootstrapConfirmation();
+</script>
+

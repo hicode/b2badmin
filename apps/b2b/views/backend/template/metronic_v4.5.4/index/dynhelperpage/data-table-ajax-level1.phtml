@@ -1,0 +1,97 @@
+<?php
+$di = \Phalcon\DI::getDefault();
+$assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path'];
+?>
+<!-- BEGIN PAGE HEADER-->
+
+<?php
+echo Metronic454CCustomHelperAjax::get_div_ajax_small_stack1();
+echo Metronic454CCustomHelperAjax::get_div_ajax_full();
+?>
+<?php
+echo \B2b\Models\CoreModels\PpB2bAdminMetronic454PluginPageHelperHeader::Get_Page_Header(false, false);
+?>
+
+<!-- END PAGE HEADER-->
+<!-- BEGIN MAIN CONTENT -->
+<?php
+echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Page_DataTableAjax();
+?>
+
+<!-- END MAIN CONTENT -->
+
+<!-- BEGIN PAGE LEVEL PLUGINS 
+<script src="/<?php echo $assetspath; ?>global/plugins/bootstrap-confirmation/bootstrap-confirmation.min.js" type="text/javascript"></script>-->
+<!-- END MAIN JS --><?php
+echo MyTags::MyCollectionGenerateCustomMinifyBottom();
+?>
+<script type="text/javascript">
+    runeveryinner();
+    var MyModalInitPage = function () {
+        Form1Click();
+    }
+    var MyModalOnClose = function () {
+        //alert('close');
+        grid.getDataTable().ajax.reload();
+    }
+
+    myaoColumns = <?php echo $di->controller_params_array[CHCrmCParams::$keyarrDataTableAjax]['myaoColumns']; ?>;
+
+<?php
+echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Js_Function_MyRunForm();
+?>
+    function saveform(grid, data)
+    {
+
+        $.ajax({
+            url: $("#save-new-record-url").val(),
+            type: "POST",
+            async: true,
+            dataType: "json",
+            data: {
+                mydata: data
+            },
+            success: function (result) {
+
+                if (result.success == '1') {
+                    alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('successsavedata1'); ?>';
+                    alert_type = "success";
+                    executeIfFunctionExist('resetform', false);
+                    grid.getDataTable().ajax.reload();
+                } else {
+                    alert_msg = result.msg;
+                    alert_type = "error";
+                }
+                toastrMsg('', alert_msg, alert_type);
+
+            },
+            error: function () {
+                alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('unkownerrorduringsave1'); ?>';
+                alert_type = "error";
+                toastrMsg('', alert_msg, alert_type);
+            }
+        });
+
+    }
+    function resetform(disablefrom)
+    {
+        $(".tblnewrecord").find('[class*="divtd"]').each(function () {
+            $(this).css({'background-color': ''});
+        });
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').each(function () {
+            $(this).val('');
+            $(this).css({'background-color': ''});
+        });
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').filter('[class*="bs-select"]').each(function () {
+            $(this).val('-1');
+        });
+        $(".tblnewrecord").find('[class*="divtd"]').filter('[class*="rocontent"]').each(function () {
+            $(this).html('');
+        });
+
+
+    }
+
+
+</script>
+

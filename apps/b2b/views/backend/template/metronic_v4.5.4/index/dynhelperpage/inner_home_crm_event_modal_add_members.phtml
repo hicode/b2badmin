@@ -1,0 +1,14 @@
+<?php
+
+$di = Phalcon\DI::getDefault();
+
+// Get core data
+$modal = \B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::Get_Modal(false, true, false);
+
+// Get contents
+$bodycontents = B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Page_DataTableAjax(CHCrmCParams::$keyarrDataTableAjax);
+
+// Replace header, and contetns with placeholders
+$modal = str_replace(\B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::$BodyContentPlaceholder, $bodycontents, $modal);
+
+echo $modal;

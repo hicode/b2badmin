@@ -1,0 +1,21 @@
+.fc-view.fc-month-view:hover, .fc-view.fc-agenda-view:hover {
+    cursor: pointer;
+}
+
+.row-details-vt2m {
+    border: 1px solid black;
+    border-radius: 50%;
+    margin-left: 15px;
+}
+
+.row-details-vt2m:hover {
+    cursor: pointer;
+}
+
+.row-details-vt2m-close {
+    background-color: red;
+}
+
+.row-details-vt2m-open {
+    background-color: green;
+}

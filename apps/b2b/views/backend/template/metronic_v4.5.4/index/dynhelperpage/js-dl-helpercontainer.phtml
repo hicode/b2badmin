@@ -1,0 +1,46 @@
+//<script>
+    var DlHelperContainer = {
+        defs: {
+            show: 500,
+            hide: 500
+        },
+        $parent: function () {
+            return $('#<?php echo B2b\Models\CoreModels\DlB2bAdminGeneralHelper::Get_Dashboard_Container_Parent_ID(); ?>');
+        },
+        $child: function () {
+            return $('#<?php echo B2b\Models\CoreModels\DlB2bAdminGeneralHelper::Get_Dashboard_Container_Child_ID(); ?>');
+        },
+        showChild: function (options) {
+            options = !$.isEmptyObject(options) ? $.extend({}, this.defs, options) : this.defs;
+            this.$child().fadeIn(options.show);
+        },
+        goToChild: function () {
+            App.scrollTo(this.$child());
+        },
+        hideChild: function (options) {
+            options = !$.isEmptyObject(options) ? $.extend({}, Dl.HelperContainer.defs, options) : Dl.HelperContainer.defs;
+            this.$child().fadeOut(options.hide);
+        },
+        emptyChild: function () {
+            this.$child().empty();
+        },
+        addContetnsChild: function (html) {
+            this.$child().append(html);
+            this.goToChild();
+        },
+        addContetnsChildClean: function (html, blshow) {
+            blshow = (checkIfParamIsNullOrUndefined(blshow) ? 1 : blshow);
+            if (blshow === 1)
+            {
+                this.$parent().show();
+            }
+            else
+            {
+                this.$parent().hide();
+            }
+            this.emptyChild();
+            this.$child().append(html);
+            this.goToChild();
+        }
+    };
+//</script>

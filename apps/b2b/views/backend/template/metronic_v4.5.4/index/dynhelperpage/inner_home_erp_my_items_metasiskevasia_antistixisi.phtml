@@ -1,0 +1,229 @@
+<?php
+$di = \Phalcon\DI::getDefault();
+$assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path'];
+?>
+<!-- BEGIN PAGE HEADER-->
+
+<?php
+echo Metronic454CCustomHelperAjax::get_div_ajax_small_stack1();
+echo Metronic454CCustomHelperAjax::get_div_ajax_full();
+?>
+<?php
+echo \B2b\Models\CoreModels\PpB2bAdminMetronic454PluginPageHelperHeader::Get_Page_Header();
+?>
+
+<!-- END PAGE HEADER-->
+<!-- BEGIN MAIN CONTENT -->
+<?php
+echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Page_DataTableAjax();
+?>
+
+<!-- END MAIN CONTENT -->
+
+<!-- BEGIN PAGE LEVEL PLUGINS 
+<script src="/<?php echo $assetspath; ?>global/plugins/bootstrap-confirmation/bootstrap-confirmation.min.js" type="text/javascript"></script>-->
+<!-- END MAIN JS -->
+<script type="text/javascript">
+    runeveryinner();
+    var MyModalInitPage = function () {
+        Form1Click();
+    }
+    var MyModalOnClose = function () {
+        //alert('close');
+        grid.getDataTable().ajax.reload();
+    }
+
+    myaoColumns = <?php echo $di->controller_params_array[CHCrmCParams::$keyarrDataTableAjax]['myaoColumns']; ?>;
+
+<?php
+echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Js_Function_MyRunForm('');
+?>
+
+<?php $pluginarrparams = $di->controller_params_array[\CHCrmCParams::$keyarrDataTableAjax]; ?>
+    function resetform(disablefrom)
+    {
+        var portlet = $('#portlet-new-record');
+        portlet.find('.save-new-record-portlet').prop('disabled', true);
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').each(function () {
+            $(this).val('');
+            $(this).prop('readonly', true);
+        });
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').filter('[class*="bs-select"]').each(function () {
+            $(this).val('-1');
+            $(this).prop('disabled', true);
+        });
+        $(".tblnewrecord").find('[class*="divtd"]').filter('[class*="rocontent"]').each(function () {
+            $(this).html('');
+        });
+        $(".tblnewrecord").find('.myfield-newrecord-mybarcodefrom').prop('readonly', disablefrom);
+        $(".myfield-newrecord-mybarcodefrom").focus();
+    }
+    function updateform(result)
+    {
+        var portlet = $('#portlet-new-record');
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').each(function () {
+            $(this).val('');
+            $(this).prop('readonly', false);
+        });
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').filter('[class*="bs-select"]').each(function () {
+            $(this).val('-1');
+            $(this).prop('disabled', false);
+        });
+        $(".divtdmydescfrom").html(result.data[0].mydesc);
+        $(".divtdmonadapolisistitlefrom").html(result.data[0].monadapolisistitle);
+        $(".divtdmyqtyfrom").html('1');
+        $(".myfield-newrecord-mybarcodefrom").val(result.data[0].mybarcode);
+        $(".myfield-newrecord-mydescto").val(result.data[0].mydesc);
+        $(".tblnewrecord").find('.myfield-newrecord-mybarcodefrom').prop('readonly', true);
+        $(".myfield-newrecord-mybarcodeto").focus();
+        portlet.find('.save-new-record-portlet').prop('disabled', false);
+    }
+    $("<?php echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Identity_Class_New_Record('mybarcodefrom', true); ?>").keyup(function (e) {
+
+        if (e.keyCode == 13) {
+            var data = {};
+            var metadata = {};
+            var alert_divid = '#bootstrap_alert_common';
+            var alert_msg = 'Unkown Error1';
+            var alert_icon = "check";
+            var alert_type = "error";
+            var myurl = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'param1' => 'getrecord', 'param2' => 'vf_erp_my_barcodes_from_paralaves_m', 'param3' => 'mybarcode')); ?>" + $(this).val() + "/";
+            var myurl2 = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'param1' => 'getrecord', 'param2' => 'vf_erp_my_items_metasiskevasia_antistixisi_m', 'param3' => 'mybarcodefrom')); ?>" + $(this).val() + "/";
+            data[$(this).attr('name')] = $(this).val();
+            $.ajax({
+                url: myurl,
+                type: "POST",
+                async: true,
+                dataType: "json",
+                data: {
+                    settings: data
+                },
+                success: function (result) {
+                    if (result.success == 1) {
+                        $.ajax({
+                            url: myurl2,
+                            type: "POST",
+                            async: true,
+                            dataType: "json",
+                            data: {
+                                settings: data
+                            },
+                            success: function (result2) {
+                                if (result2.success == 0) {
+                                    alert_type = "success";
+                                    alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::$AvailablePluginAliasName, 'datatablesv11010_inner_home_erp_krestena_my_items_metasiskevasia_antistixisiRecordfound1'); ?>';
+                                    updateform(result);
+                                } else {
+                                    success = 0;
+                                    alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::$AvailablePluginAliasName, 'datatablesv11010_inner_home_erp_krestena_my_items_metasiskevasia_antistixisiRecordAlreadyExist2'); ?>';
+                                    alert_type = "warning";
+                                }
+                                toastrMsg('', alert_msg, alert_type);
+                            },
+                            error: function () {
+                                alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::$AvailablePluginAliasName, 'datatablesv11010_inner_home_erp_krestena_my_items_metasiskevasia_antistixisiUnkownErrorDuringsecondstep'); ?>';
+                                alert_type = "error";
+                            }
+                        });
+                    } else
+                    {
+                        resetform(false);
+                        alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::$AvailablePluginAliasName, 'datatablesv11010_inner_home_erp_krestena_my_items_metasiskevasia_antistixisiNorecordfound2'); ?>';
+                        alert_type = "warning";
+                        toastrMsg('', alert_msg, alert_type);
+                    }
+
+                },
+                error: function () {
+                    resetform(false);
+                    alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::$AvailablePluginAliasName, 'datatablesv11010_inner_home_erp_krestena_my_items_metasiskevasia_antistixisiUnkownErrorDuringfirststep'); ?>';
+                    alert_type = "error";
+                    toastrMsg('', alert_msg, alert_type);
+                }
+            });
+            return false;
+            $('input[type="text"][class^="myfield-newrecord-"]').each(function () {
+                data[$(this).attr('name')] = $(this).val();
+            });
+            $('input.timepicker.calendar-settings-field').each(function () {
+                data[$(this).attr('name')] = $(this).val();
+            });
+            $('select.bs-select.calendar-settings-field').each(function () {
+                data[$(this).attr('name')] = $(this).val();
+            });
+            $('select.bs-select.resource-field').each(function () {
+                data[$(this).attr('name')] = $(this).val();
+            });
+            $('input[type="checkbox"].resource-field').each(function () {
+                data[$(this).attr('name')] = $(this).prop('checked');
+            });
+
+            $('input[type="hidden"].resource-field').each(function () {
+                data[$(this).attr('name')] = $(this).val();
+            });
+            metadata['id'] = '<?php echo $pluginarrparams['id']; //fkplugin                                            ?>';
+            // Save settings
+            $(".divtdmydescfrom").html('sdf');
+            $(".divtdmyqtyfrom").html('1');
+            $(".tblnewrecord").find('input').prop('readonly', false);
+            $(".myfield-newrecord-mybarcodeto").focus();
+            $.ajax({
+                url: "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'param1' => 'getrecord', 'param2' => 'vf_erp_my_barcodes_from_paralaves_m', 'param3' => 'mybarcode')); ?>",
+                //url: "<?php echo $di->controller_params_array['html_base_path'] ?>template/b2badmin/theme/admin_1/vt2m_save_calendar_settings.php",
+                type: "POST",
+                async: true,
+                dataType: "json",
+                data: {
+                    settings: data,
+                    metadata: metadata
+                },
+                success: function (result) {
+                    if (result.status == '1') {
+                        var calendar = $('#calendar-private');
+                        var view = calendar.fullCalendar('getView');
+                        var date_start = calendar.fullCalendar('getDate');//calendar.fullCalendar('getView').start;
+                        //var date_end = calendar.fullCalendar('getView').end;
+                        //alert(calendar.fullCalendar('getDate'));
+                        //alert(date_start);
+                        //alert(date_end);
+                        //var eventsFromCalendar = calendar.fullCalendar('clientEvents');
+                        calendar.fullCalendar('destroy');
+                        LoadFullCalendarv261(view.name, date_start);
+
+                        //calendar.fullCalendar( 'changeView', view.name );
+                        //calendar.fullCalendar( 'gotoDate',  2010, 5, 12 );
+                        //calendar.fullCalendar('removeEvents');
+                        //calendar.fullCalendar('addEventSource', eventsFromCalendar);
+                        //calendar.fullCalendar( 'rerenderEvents' );
+                        //calendar.fullCalendar('refetchEvents');
+                        //window.location.reload();
+                    } else {
+                        alert_msg = '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginFullCalendar::$AvailablePluginAliasName, 'Thesettingsnotupdatedsuccesfully1'); ?>';
+                        alert_icon = "warning";
+                        alert_type = "danger";
+                    }
+                    App.alert({container: alert_divid,
+                        place: "append",
+                        type: alert_type,
+                        message: alert_msg,
+                        close: 1,
+                        reset: 1,
+                        focus: 1,
+                        closeInSeconds: 5,
+                        icon: alert_icon,
+                    });
+                },
+                error: function () {
+                    alert('Could not save calendar settings');
+                    HelperFns.unblockUI(portlet);
+                    HelperFns.unblockUI(button.closest('div.actions'));
+                }
+            });
+
+        }
+    });
+
+
+
+</script>
+

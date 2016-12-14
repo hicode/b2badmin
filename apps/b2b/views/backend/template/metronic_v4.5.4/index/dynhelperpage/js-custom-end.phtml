@@ -1,0 +1,30 @@
+$.extend(
+        {
+            redirectPost: function (location, args, argssplitseperator, bldecodeURIComponent)
+            {
+                var form = '';
+                if (!argssplitseperator) {
+                    argssplitseperator = '&';
+                }
+                if (!bldecodeURIComponent) {
+                    bldecodeURIComponent = true;
+                }
+                /*$.each( args, function( key, value ) {
+                 value = value.split('"').join('\"')
+                 form += '<input type="hidden" name="'+key+'" value="'+value+'">';
+                 });*/
+                args = args.split(argssplitseperator);
+                $.each(args, function (key, value) {
+                    newargarray = value.split('=');
+                    newkey = newargarray[0];
+                    newvalue = newargarray[1];
+                    if (bldecodeURIComponent == true)
+                    {
+                        newkey = decodeURIComponent(newkey);
+                        newvalue = decodeURIComponent(newvalue);
+                    }
+                    form += '<input type="hidden" name="' + newkey + '" value="' + newvalue + '">';
+                });
+                $('<form action="' + location + '" method="POST" target="_blank">' + form + '</form>').appendTo($(document.body)).submit();
+            }
+        });

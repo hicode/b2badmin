@@ -1,0 +1,10 @@
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (1, :mykatastima, 'Γνωστός');
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (2, :mykatastima, 'Site ');
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (3, :mykatastima, 'Facebook');
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (4, :mykatastima, 'Ηλιόραμα');
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (5, :mykatastima, ' Οδηγός Ηλιούπολης');
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (6, :mykatastima, '11880 internet');
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (7, :mykatastima, '11880 έντυπο');
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (8, :mykatastima, '11888 app');
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (9, :mykatastima, '11888 site');
+INSERT INTO core_crm_where_find_us (myid, mykatastima, title) VALUES (10, :mykatastima, '11888 τηλεφωνικά');

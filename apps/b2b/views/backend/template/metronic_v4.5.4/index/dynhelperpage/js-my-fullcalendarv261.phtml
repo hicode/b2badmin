@@ -1,0 +1,1034 @@
+<?php
+$di = Phalcon\DI::getDefault();
+?>
+<?php $assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path']; ?>
+<?php $pluginarrparams = $di->controller_params_array[\CHCrmCParams::$keyarrFullCalendar]; ?>
+<?php B2b\Models\CoreModels\PpB2bAdminVfroutepagepluginnoavailableparams::Get_Page_Params(B2b\Models\CoreModels\DlB2bAdminFullCalendar::Get_Create_Event_Modal_Helper_Page_Name()); ?>
+//<script>
+    // DLS20161111
+    var arrcals = {};
+    var HelperFns = {
+        Calendar: {
+            Event: {
+                loadMainModal: function (data) {
+                    ModalGeneral.load($('#<?php echo \B2b\Models\CoreModels\DlB2bAdminFullCalendar::Get_Create_Event_Modal_ID() ?>'), '<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => \B2b\Models\CoreModels\DlB2bAdminFullCalendar::Get_Create_Event_Modal_Helper_Page_Name())); ?>', function (modal) {
+                        modal.modal({
+                            "width": (parseFloat($(window).width()) * 0.65)
+                        });
+                        Dl.Calendar.InitForm($('.dl-create-new-event'), data);
+                    });
+                },
+                // DLS20161012
+                loadEventPortlet: function (data) {
+                    Dl.Calendar.ProcessPortletEvent(data);
+                }
+                // DLE20161012
+            },
+            eventAddPerson: function (data) {
+                alert('add person is clicked');
+            },
+            eventRemovePerson: function (data) {
+                alert('remove person is clicked');
+            },
+            eventCopy: function (data) {
+                alert('copy is clicked');
+            },
+            eventPrintPDF: function (data) {
+                alert('print is clicked');
+            },
+            eventDelete: function (data) {
+                alert('delete is clicked');
+            }
+        },
+        settings: {
+            btnShowClick: function ()
+            {
+                var fkplugin = $(this).data('fkplugin');
+                //console.log('fkplugin=' + fkplugin);
+                var mykatastima = arrcals[fkplugin]['mykatastima'];
+                var calendar = arrcals[fkplugin]['calendar'];
+                var jsonsettings = arrcals[fkplugin]['jsonsettings'];
+                var btnshow = $(this);
+                var portletsettings = arrcals[fkplugin]['portletsettings'];
+                portletsettings.fadeIn(750);
+                portletsettings.off("click", '.close-settings-portlet');
+                portletsettings.on('click', '.close-settings-portlet', function () {
+                    HelperFns.settings.btnHideClick(calendar, portletsettings, btnshow);
+                });
+                portletsettings.off("click", '.save-settings-portlet');
+                portletsettings.on('click', '.save-settings-portlet', function () {
+                    HelperFns.settings.btnSaveClick(fkplugin, mykatastima, calendar, portletsettings, btnshow);
+                });
+                HelperFns.settings.initElements(portletsettings);
+            },
+            initElements: function (portletsettings)
+            {
+                // Arxikopoiw ta switches.
+                $.uniform.restore("input[class*='-switch']");
+                portletsettings.find('input.simple-switch').bootstrapSwitch({
+                    onSwitchChange: function () {
+                        // An to switch exei class calendar-settings-day tote elegxw na dw ti tha kanw
+                        if ($(this).hasClass('calendar-settings-day')) {
+                            // Elegxw na dw pio tha kanw disable
+                            var select = $('select[name="day-start"]');
+                            var option = select.find('option[value="' + $(this).attr('data-day-num') + '"]');
+                            if (!$(this).bootstrapSwitch('state')) {
+                                option.attr('disabled', true).css('color', 'red');
+                                // Elegxw na dw an auto pou ekana disable einai selected.
+                                // An nai tote kanw to epomeno diathesimo (not disabled) selected.
+                                if (parseInt(option.attr('value')) === parseInt(select.find('option:selected').attr('value'))) {
+                                    HelperFns.changeOptionStatus(select, option);
+                                }
+                            } else {
+                                option.attr('disabled', false).css('color', '');
+                            }
+                        }
+                    }
+                });
+                portletsettings.find('.resource-blenabled-switch').bootstrapSwitch({
+                });
+                portletsettings.find('.hidden-minicolor').minicolors({
+                    theme: "bootstrap"
+                });
+                portletsettings.find('input.hour-switch').bootstrapSwitch({
+                    onSwitchChange: function () {
+<?php
+$tpl24 = '<select class="bs-select form-control input-small calendar-settings-field select-hour24" name="--myelementname--" style="display: inline;float:right;">';
+$tpl12 = '<select class="bs-select form-control input-small calendar-settings-field select-hour12" name="--myelementname--" style="display: inline;float:right;">';
+for ($i = 1; $i <= 24; $i++) {
+    $ft = $i . ":00";
+    $tpl24 .= '<option value="' . $i . '">' . $ft . '</option>';
+
+    $ampm = $i > 12 ? \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::$keyarrPluginTranslates, 'PM1') : \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::$keyarrPluginTranslates, 'AM1');
+    $ft = ($i > 12 ? $i - 12 : $i) . ":00 " . $ampm;
+
+    $tpl12 .= '<option value="' . $i . '">' . $ft . '</option>';
+}
+$tpl24 .= "</select>";
+$tpl12 .= "</select>";
+?>
+                        // false = 24H
+                        // true = 12H
+                        if (!$(this).bootstrapSwitch('state')) {
+                            portletsettings.find('select.calendar-settings-field.select-hour12').each(function () {
+                                var td = $(this).closest('td');
+                                var select = $(this);
+                                var list = '<?php echo $tpl24; ?>';
+                                var selectedval = select.find('option:selected').attr('value');
+                                var searchkey = '"' + selectedval + '"';
+                                var replacekey = '"' + selectedval + '" selected="selected" ';
+                                list = list.replace(searchkey, replacekey);
+                                list = list.replace('--myelementname--', select.attr('name'));
+                                select.remove();
+                                td.append(list);
+                            });
+                        } else {
+                            portletsettings.find('select.calendar-settings-field.select-hour24').each(function () {
+                                var td = $(this).closest('td');
+                                var select = $(this);
+                                var list = '<?php echo $tpl12; ?>';
+                                var selectedval = select.find('option:selected').attr('value');
+                                var searchkey = '"' + selectedval + '"';
+                                var replacekey = '"' + selectedval + '" selected="selected" ';
+                                list = list.replace(searchkey, replacekey);
+                                list = list.replace('--myelementname--', select.attr('name'));
+                                select.remove();
+                                td.append(list);
+                            });
+                        }
+                    }
+                });
+            },
+            btnHideClick: function (calendar, portletsettings, btnshow)
+            {
+                portletsettings.fadeOut(500, function () {
+                    //portletsettings.remove();
+                    HelperFns.unblockUI(calendar.find('div.fc-toolbar'));
+                    HelperFns.unblockUI(btnshow.closest('div.actions'));
+                });
+            },
+            btnSaveClick: function (fkplugin, mykatastima, calendar, portletsettings, btnshow)
+            {
+                var data = {};
+                var metadata = {};
+                var alert_divid = '#bootstrap_alert_common';
+                var alert_msg = '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginFullCalendar::$AvailablePluginAliasName, 'Thesettingsupdatedsuccesfully1'); ?>';
+                var alert_icon = "check";
+                var alert_type = "success";
+                var mysaveurl = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'mykatastima' => 'mykatastimaforreplace', 'param1' => 'plugin', 'param2' => 'fullcalendar', 'param3' => 'savesettings')); ?>";
+                mysaveurl = mysaveurl.replace('/mykatastimaforreplace/', '/' + mykatastima + '/');
+                $('input[type="checkbox"].calendar-settings-field').each(function () {
+                    data[$(this).attr('name')] = $(this).prop('checked');
+                });
+                $('input.timepicker.calendar-settings-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                $('select.bs-select.calendar-settings-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                $('select.bs-select.resource-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                $('input[type="checkbox"].resource-field').each(function () {
+                    data[$(this).attr('name')] = $(this).prop('checked');
+                });
+                $('input[type="text"].resource-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                $('input[type="hidden"].resource-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                metadata['id'] = fkplugin; //jsonsettings.id; //fkplugin                                 ?>';
+                // Save settings
+                $.ajax({
+                    url: mysaveurl,
+                    //url: "<?php echo $di->controller_params_array['html_base_path'] ?>template/b2badmin/theme/admin_1/vt2m_save_calendar_settings.php",
+                    type: "POST",
+                    async: true,
+                    dataType: "json",
+                    data: {
+                        settings: data,
+                        metadata: metadata
+                    },
+                    success: function (result) {
+                        if (result.status == '1') {
+                            var view = calendar.fullCalendar('getView');
+                            var date_start = calendar.fullCalendar('getDate'); //calendar.fullCalendar('getView').start;
+                            //var date_end = calendar.fullCalendar('getView').end;
+                            //alert(calendar.fullCalendar('getDate'));
+                            //alert(date_start);
+                            //alert(date_end);
+                            //var eventsFromCalendar = calendar.fullCalendar('clientEvents');
+                            calendar.fullCalendar('destroy');
+                            LoadFullCalendarv261(view.name, date_start, mykatastima, fkplugin);
+                            //calendar.fullCalendar( 'changeView', view.name );
+                            //calendar.fullCalendar( 'gotoDate',  2010, 5, 12 );
+                            //calendar.fullCalendar('removeEvents');
+                            //calendar.fullCalendar('addEventSource', eventsFromCalendar);
+                            //calendar.fullCalendar( 'rerenderEvents' );
+                            //calendar.fullCalendar('refetchEvents');
+                            //window.location.reload();
+                        } else {
+                            alert_msg = '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginFullCalendar::$AvailablePluginAliasName, 'Thesettingsnotupdatedsuccesfully1'); ?>';
+                            alert_icon = "warning";
+                            alert_type = "danger";
+                        }
+                        App.alert({container: alert_divid,
+                            place: "append",
+                            type: alert_type,
+                            message: alert_msg,
+                            close: 1,
+                            reset: 1,
+                            focus: 1,
+                            closeInSeconds: 5,
+                            icon: alert_icon,
+                        });
+                    },
+                    error: function () {
+                        alert('Could not save calendar settings');
+                        HelperFns.unblockUI(portletsettings);
+                        HelperFns.unblockUI(btnshow.closest('div.actions'));
+                    }
+                });
+
+            }
+        },
+        btnGoToDateClick: function ()
+        {
+            var fkplugin = $(this).data('fkplugin');
+            //console.log('fkplugin=' + fkplugin);
+            var mykatastima = arrcals[fkplugin]['mykatastima'];
+            var calendar = arrcals[fkplugin]['calendar'];
+            var jsonsettings = arrcals[fkplugin]['jsonsettings'];
+            var button = $(this);
+            var portlet = $('#gotodate-datepaginator');
+            moment.locale('el');
+            portlet.fadeIn(750);
+            var datePag = portlet.find('#go-to-date');
+            var myoffdays = '';
+            if (jsonsettings.monday == 0)
+            {
+                myoffdays = myoffdays + "Mon,";
+            }
+            if (jsonsettings.tuesday == 0)
+            {
+                myoffdays = myoffdays + "Tue,";
+            }
+            if (jsonsettings.wednesday == 0)
+            {
+                myoffdays = myoffdays + "Wed,";
+            }
+            if (jsonsettings.thursday == 0)
+            {
+                myoffdays = myoffdays + "Thu,";
+            }
+            if (jsonsettings.friday == 0)
+            {
+                myoffdays = myoffdays + "Fri,";
+            }
+            if (jsonsettings.saturday == 0)
+            {
+                myoffdays = myoffdays + "Sat,";
+            }
+            if (jsonsettings.sunday == 0)
+            {
+                myoffdays = myoffdays + "Sun,";
+            }
+            myoffdays = myoffdays.slice(0, -1);
+            datePag.datepaginator({
+                text: jsonsettings.datepaginator.text, //'ddd</br>M-D',
+                textSelected: jsonsettings.datepaginator.textSelected, //'dddd</br>DD-MM-YYYY',
+                offDays: myoffdays, //data.offDays,
+                showCalendar: jsonsettings.datepaginator.showCalendar, //true,
+                size: jsonsettings.datepaginator.size, //"<?php echo $pluginarrparams['datepaginator']['size']; ?>",
+                onSelectedDateChanged: function (event, date) {
+                    var selectedDate = date.format(jsonsettings.datepaginator.dateformat);
+                    var nextDate = datePag.find('a[data-moment="' + selectedDate + '"]').closest('li').next().find('a').attr('data-moment');
+                    if (datePag.find('a[data-moment="' + selectedDate + '"]').hasClass('dp-off')) {
+                        datePag.datepaginator('setSelectedDate', [nextDate, jsonsettings.datepaginator.dateformat]);
+                    } else {
+                        calendar.fullCalendar('gotoDate', date);
+                    }
+                }
+            });
+            var myoffdays2 = '';
+            if (jsonsettings.monday == 1)
+            {
+                myoffdays2 = myoffdays2 + "1,";
+            }
+            if (jsonsettings.tuesday == 1)
+            {
+                myoffdays2 = myoffdays2 + "2,";
+            }
+            if (jsonsettings.wednesday == 1)
+            {
+                myoffdays2 = myoffdays2 + "3,";
+            }
+            if (jsonsettings.thursday == 1)
+            {
+                myoffdays2 = myoffdays2 + "4,";
+            }
+            if (jsonsettings.friday == 1)
+            {
+                myoffdays2 = myoffdays2 + "5,";
+            }
+            if (jsonsettings.saturday == 1)
+            {
+                myoffdays2 = myoffdays2 + "6,";
+            }
+            if (jsonsettings.sunday == 1)
+            {
+                myoffdays2 = myoffdays2 + "0,";
+            }
+            myoffdays2 = myoffdays2.slice(0, -1);
+            //alert($("#advance-date-search" ).text());
+            $("#advance-date-search").datepicker({
+                autoclose: true,
+                daysOfWeekDisabled: myoffdays2, //data.offDays2,
+            }).on('changeDate', function (e) {
+                datePag.datepaginator('setSelectedDate', $.datepicker.formatDate("yy-mm-dd", e.date));
+            });
+            portlet.on('click', '.close-gotodate-portlet', function () {
+                portlet.fadeOut(500, function () {
+                    //portlet.remove();
+                    HelperFns.unblockUI(calendar.find('div.fc-toolbar'));
+                    HelperFns.unblockUI(button.closest('div.actions'));
+                });
+            });
+            //},
+            //error: function () {
+            //    alert('Could not get gotodate tpl');
+            //}
+            //});
+        },
+        blockUI: function (target) {
+            App.blockUI({
+                target: target != '' ? target : 'html',
+                boxed: false,
+                animate: false,
+                message: ' ',
+                textOnly: true,
+                iconOnly: false
+            });
+        },
+        unblockUI: function (target) {
+            App.unblockUI(target != '' ? target : 'html');
+        },
+        changeOptionStatus: function (select, current_option) {
+            if (current_option.is(':last-child')) {
+                this.changeOptionStatus(select, select.children(':first'));
+            } else {
+                if (current_option.next().is(':disabled')) {
+                    this.changeOptionStatus(select, current_option.next());
+                } else {
+                    select.val(current_option.next().val());
+                }
+            }
+        },
+        btnCalendarViewerHelper: function () {
+            $('#private-calendar-hide-event-viewer').on('click', function () {
+                var portletViewer = $('#portlet-viewer-calendar-events');
+                var portletCalendar = $('#portlet-calendar');
+                var buttonViewerShow = $('#private-calendar-show-event-viewer');
+                portletViewer.fadeOut(500, function () {
+                    // Do some ajax if needed, before remove of portlet
+                    portletViewer.remove();
+                    portletCalendar.removeClass('col-md-9').addClass('col-md-12');
+                    buttonViewerShow.fadeIn(500);
+                });
+            });
+        },
+        privatecalendarsettingsbtnshowclick: function () {
+
+
+
+            // Arxikopoiw ta switches.
+            $.uniform.restore("input[class*='-switch']");
+            portlet.find('input.simple-switch').bootstrapSwitch({
+                onSwitchChange: function () {
+                    // An to switch exei class calendar-settings-day tote elegxw na dw ti tha kanw
+                    if ($(this).hasClass('calendar-settings-day')) {
+                        // Elegxw na dw pio tha kanw disable
+                        var select = $('select[name="day-start"]');
+                        var option = select.find('option[value="' + $(this).attr('data-day-num') + '"]');
+                        if (!$(this).bootstrapSwitch('state')) {
+                            option.attr('disabled', true).css('color', 'red');
+                            // Elegxw na dw an auto pou ekana disable einai selected.
+                            // An nai tote kanw to epomeno diathesimo (not disabled) selected.
+                            if (parseInt(option.attr('value')) === parseInt(select.find('option:selected').attr('value'))) {
+                                HelperFns.changeOptionStatus(select, option);
+                            }
+                        } else {
+                            option.attr('disabled', false).css('color', '');
+                        }
+                    }
+                }
+            });
+            portlet.find('.resource-blenabled-switch').bootstrapSwitch({
+            });
+            portlet.find('.hidden-minicolor').minicolors({
+                theme: "bootstrap"
+            });
+            portlet.find('input.hour-switch').bootstrapSwitch({
+                onSwitchChange: function () {
+<?php
+$tpl24 = '<select class="bs-select form-control input-small calendar-settings-field select-hour24" name="--myelementname--" style="display: inline;float:right;">';
+$tpl12 = '<select class="bs-select form-control input-small calendar-settings-field select-hour12" name="--myelementname--" style="display: inline;float:right;">';
+for ($i = 1; $i <= 24; $i++) {
+    $ft = $i . ":00";
+    $tpl24 .= '<option value="' . $i . '">' . $ft . '</option>';
+
+    $ampm = $i > 12 ? \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::$keyarrPluginTranslates, 'PM1') : \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::$keyarrPluginTranslates, 'AM1');
+    $ft = ($i > 12 ? $i - 12 : $i) . ":00 " . $ampm;
+
+    $tpl12 .= '<option value="' . $i . '">' . $ft . '</option>';
+}
+$tpl24 .= "</select>";
+$tpl12 .= "</select>";
+?>
+                    // false = 24H
+                    // true = 12H
+                    if (!$(this).bootstrapSwitch('state')) {
+                        portlet.find('select.calendar-settings-field.select-hour12').each(function () {
+                            var td = $(this).closest('td');
+                            var select = $(this);
+                            var list = '<?php echo $tpl24; ?>';
+                            var selectedval = select.find('option:selected').attr('value');
+                            var searchkey = '"' + selectedval + '"';
+                            var replacekey = '"' + selectedval + '" selected="selected" ';
+                            list = list.replace(searchkey, replacekey);
+                            list = list.replace('--myelementname--', select.attr('name'));
+                            select.remove();
+                            td.append(list);
+                        });
+                    } else {
+                        portlet.find('select.calendar-settings-field.select-hour24').each(function () {
+                            var td = $(this).closest('td');
+                            var select = $(this);
+                            var list = '<?php echo $tpl12; ?>';
+                            var selectedval = select.find('option:selected').attr('value');
+                            var searchkey = '"' + selectedval + '"';
+                            var replacekey = '"' + selectedval + '" selected="selected" ';
+                            list = list.replace(searchkey, replacekey);
+                            list = list.replace('--myelementname--', select.attr('name'));
+                            select.remove();
+                            td.append(list);
+                        });
+                    }
+                }
+            });
+        },
+        // Vazw click listeners sta koumpia twn portlet.
+        enableportletlisteners: function () {
+            var fkplugin = $(this).data('fkplugin');
+            var mykatastima = $(this).data('mykatastima');
+            var calendar = $('#calendar-private');
+            var jsonsettings = arrcaljsonsettings[fkplugin];
+            var button = $(this);
+            //$.ajax({
+            //    url: "<?php echo $di->controller_params_array['html_base_path'] ?>template/b2badmin/theme/admin_1/vt2m_settings_tpl.php",
+            //    type: "POST",
+            //    async: true,
+            //    success: function (result) {
+            //var data = JSON.parse(result);
+            // Vazw to tpl
+            //calendar.closest('div.calendar-div-wrapper').before(data.html);
+            // Kanw block to toolbar kai to button
+            //HelperFns.blockUI(calendar.find('div.fc-toolbar'));
+            //HelperFns.blockUI(button.closest('div.actions'));
+            // Vazw listeners sta buttons tou portlet.
+            //var portlet = $('#' + data.id);
+            var portlet = $('#portlet-settings');
+            portlet.fadeIn(750);
+            portlet.on('click', '.close-settings-portlet', function () {
+                portlet.fadeOut(500, function () {
+                    //portlet.remove();
+                    HelperFns.unblockUI(calendar.find('div.fc-toolbar'));
+                    HelperFns.unblockUI(button.closest('div.actions'));
+                });
+            });
+            portlet.on('click', '.save-settings-portlet', function () {
+                // Mazeuw ta dada se enan pinaka.
+                var data = {};
+                var metadata = {};
+                var alert_divid = '#bootstrap_alert_common';
+                var alert_msg = '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginFullCalendar::$AvailablePluginAliasName, 'Thesettingsupdatedsuccesfully1'); ?>';
+                var alert_icon = "check";
+                var alert_type = "success";
+                var mysaveurl = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'mykatastima' => 'mykatastimaforreplace', 'param1' => 'plugin', 'param2' => 'fullcalendar', 'param3' => 'savesettings')); ?>";
+                if (checkIfParamIsNullOrUndefined(mykatastima) === true)
+                {
+                    mykatastima = "<?php echo CHCrmCParams::My_get_mykatastima_default(); ?>";
+                }
+
+                mysaveurl = mysaveurl.replace('/mykatastimaforreplace/', '/' + mykatastima + '/');
+                $('input[type="checkbox"].calendar-settings-field').each(function () {
+                    data[$(this).attr('name')] = $(this).prop('checked');
+                });
+                $('input.timepicker.calendar-settings-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                $('select.bs-select.calendar-settings-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                $('select.bs-select.resource-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                $('input[type="checkbox"].resource-field').each(function () {
+                    data[$(this).attr('name')] = $(this).prop('checked');
+                });
+                $('input[type="text"].resource-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                $('input[type="hidden"].resource-field').each(function () {
+                    data[$(this).attr('name')] = $(this).val();
+                });
+                metadata['id'] = fkplugin; //jsonsettings.id; //fkplugin                                 ?>';
+                // Save settings
+                $.ajax({
+                    url: mysaveurl,
+                    //url: "<?php echo $di->controller_params_array['html_base_path'] ?>template/b2badmin/theme/admin_1/vt2m_save_calendar_settings.php",
+                    type: "POST",
+                    async: true,
+                    dataType: "json",
+                    data: {
+                        settings: data,
+                        metadata: metadata
+                    },
+                    success: function (result) {
+                        if (result.status == '1') {
+                            var calendar = $('#calendar-private');
+                            var view = calendar.fullCalendar('getView');
+                            var date_start = calendar.fullCalendar('getDate'); //calendar.fullCalendar('getView').start;
+                            //var date_end = calendar.fullCalendar('getView').end;
+                            //alert(calendar.fullCalendar('getDate'));
+                            //alert(date_start);
+                            //alert(date_end);
+                            //var eventsFromCalendar = calendar.fullCalendar('clientEvents');
+                            calendar.fullCalendar('destroy');
+                            LoadFullCalendarv261(view.name, date_start, mykatastima, fkplugin);
+                            //calendar.fullCalendar( 'changeView', view.name );
+                            //calendar.fullCalendar( 'gotoDate',  2010, 5, 12 );
+                            //calendar.fullCalendar('removeEvents');
+                            //calendar.fullCalendar('addEventSource', eventsFromCalendar);
+                            //calendar.fullCalendar( 'rerenderEvents' );
+                            //calendar.fullCalendar('refetchEvents');
+                            //window.location.reload();
+                        } else {
+                            alert_msg = '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginFullCalendar::$AvailablePluginAliasName, 'Thesettingsnotupdatedsuccesfully1'); ?>';
+                            alert_icon = "warning";
+                            alert_type = "danger";
+                        }
+                        App.alert({container: alert_divid,
+                            place: "append",
+                            type: alert_type,
+                            message: alert_msg,
+                            close: 1,
+                            reset: 1,
+                            focus: 1,
+                            closeInSeconds: 5,
+                            icon: alert_icon,
+                        });
+                    },
+                    error: function () {
+                        alert('Could not save calendar settings');
+                        HelperFns.unblockUI(portlet);
+                        HelperFns.unblockUI(button.closest('div.actions'));
+                    }
+                });
+            });
+            // Arxikopoiw ta switches.
+            $.uniform.restore("input[class*='-switch']");
+            portlet.find('input.simple-switch').bootstrapSwitch({
+                onSwitchChange: function () {
+                    // An to switch exei class calendar-settings-day tote elegxw na dw ti tha kanw
+                    if ($(this).hasClass('calendar-settings-day')) {
+                        // Elegxw na dw pio tha kanw disable
+                        var select = $('select[name="day-start"]');
+                        var option = select.find('option[value="' + $(this).attr('data-day-num') + '"]');
+                        if (!$(this).bootstrapSwitch('state')) {
+                            option.attr('disabled', true).css('color', 'red');
+                            // Elegxw na dw an auto pou ekana disable einai selected.
+                            // An nai tote kanw to epomeno diathesimo (not disabled) selected.
+                            if (parseInt(option.attr('value')) === parseInt(select.find('option:selected').attr('value'))) {
+                                HelperFns.changeOptionStatus(select, option);
+                            }
+                        } else {
+                            option.attr('disabled', false).css('color', '');
+                        }
+                    }
+                }
+            });
+            portlet.find('.resource-blenabled-switch').bootstrapSwitch({
+            });
+            portlet.find('.hidden-minicolor').minicolors({
+                theme: "bootstrap"
+            });
+            portlet.find('input.hour-switch').bootstrapSwitch({
+                onSwitchChange: function () {
+<?php
+$tpl24 = '<select class="bs-select form-control input-small calendar-settings-field select-hour24" name="--myelementname--" style="display: inline;float:right;">';
+$tpl12 = '<select class="bs-select form-control input-small calendar-settings-field select-hour12" name="--myelementname--" style="display: inline;float:right;">';
+for ($i = 1; $i <= 24; $i++) {
+    $ft = $i . ":00";
+    $tpl24 .= '<option value="' . $i . '">' . $ft . '</option>';
+
+    $ampm = $i > 12 ? \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::$keyarrPluginTranslates, 'PM1') : \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::$keyarrPluginTranslates, 'AM1');
+    $ft = ($i > 12 ? $i - 12 : $i) . ":00 " . $ampm;
+
+    $tpl12 .= '<option value="' . $i . '">' . $ft . '</option>';
+}
+$tpl24 .= "</select>";
+$tpl12 .= "</select>";
+?>
+                    // false = 24H
+                    // true = 12H
+                    if (!$(this).bootstrapSwitch('state')) {
+                        portlet.find('select.calendar-settings-field.select-hour12').each(function () {
+                            var td = $(this).closest('td');
+                            var select = $(this);
+                            var list = '<?php echo $tpl24; ?>';
+                            var selectedval = select.find('option:selected').attr('value');
+                            var searchkey = '"' + selectedval + '"';
+                            var replacekey = '"' + selectedval + '" selected="selected" ';
+                            list = list.replace(searchkey, replacekey);
+                            list = list.replace('--myelementname--', select.attr('name'));
+                            select.remove();
+                            td.append(list);
+                        });
+                    } else {
+                        portlet.find('select.calendar-settings-field.select-hour24').each(function () {
+                            var td = $(this).closest('td');
+                            var select = $(this);
+                            var list = '<?php echo $tpl12; ?>';
+                            var selectedval = select.find('option:selected').attr('value');
+                            var searchkey = '"' + selectedval + '"';
+                            var replacekey = '"' + selectedval + '" selected="selected" ';
+                            list = list.replace(searchkey, replacekey);
+                            list = list.replace('--myelementname--', select.attr('name'));
+                            select.remove();
+                            td.append(list);
+                        });
+                    }
+                }
+            });
+            $('#private-calendar-go-to-date-btn').on('click', function () {
+                var button = $(this);
+                //$.ajax({
+                //url: "<?php echo $di->controller_params_array['html_base_path'] ?>template/b2badmin/theme/admin_1/vt2m_gotodate_tpl.php",
+                //type: "POST",
+                //async: true,
+                //success: function (result) {
+                // Kanw block to toolbar kai ta button
+                //HelperFns.blockUI(calendar.find('div.fc-toolbar'));
+                //HelperFns.blockUI(button.closest('div.actions'));
+                // Vazw ta data
+                //var data = JSON.parse(result);
+                //calendar.closest('div.calendar-div-wrapper').before(data.html);
+                var portlet = $('#gotodate-datepaginator');
+                //moment.locale('el');
+                portlet.fadeIn(750);
+                var datePag = portlet.find('#go-to-date');
+                var myoffdays = '';
+                if (jsonsettings.monday == 1)
+                {
+                    myoffdays = myoffdays + "Mon,";
+                }
+                if (jsonsettings.tuesday == 1)
+                {
+                    myoffdays = myoffdays + "Tue,";
+                }
+                if (jsonsettings.wednesday == 1)
+                {
+                    myoffdays = myoffdays + "Wed,";
+                }
+                if (jsonsettings.thursday == 1)
+                {
+                    myoffdays = myoffdays + "Thu,";
+                }
+                if (jsonsettings.friday == 1)
+                {
+                    myoffdays = myoffdays + "Fri,";
+                }
+                if (jsonsettings.saturday == 1)
+                {
+                    myoffdays = myoffdays + "Sat,";
+                }
+                if (jsonsettings.sunday == 1)
+                {
+                    myoffdays = myoffdays + "Sun,";
+                }
+                myoffdays = myoffdays.slice(0, -1);
+                datePag.datepaginator({
+                    text: jsonsettings.datepaginator.text, //'ddd</br>M-D',
+                    textSelected: jsonsettings.datepaginator.textSelected, //'dddd</br>DD-MM-YYYY',
+                    offDays: myoffdays, //data.offDays,
+                    showCalendar: jsonsettings.datepaginator.showCalendar, //true,
+                    size: jsonsettings.datepaginator.size, //"<?php echo $pluginarrparams['datepaginator']['size']; ?>",
+                    onSelectedDateChanged: function (event, date) {
+                        var selectedDate = date.format(jsonsettings.datepaginator.dateformat);
+                        var nextDate = datePag.find('a[data-moment="' + selectedDate + '"]').closest('li').next().find('a').attr('data-moment');
+                        console.log(selectedDate);
+                        if (datePag.find('a[data-moment="' + selectedDate + '"]').hasClass('dp-off')) {
+                            datePag.datepaginator('setSelectedDate', [nextDate, jsonsettings.datepaginator.dateformat]);
+                        } else {
+                            calendar.fullCalendar('gotoDate', date);
+                        }
+                    }
+                });
+                var myoffdays2 = '';
+                if (jsonsettings.monday == 1)
+                {
+                    myoffdays2 = myoffdays2 + "1,";
+                }
+                if (jsonsettings.tuesday == 1)
+                {
+                    myoffdays2 = myoffdays2 + "2,";
+                }
+                if (jsonsettings.wednesday == 1)
+                {
+                    myoffdays2 = myoffdays2 + "3,";
+                }
+                if (jsonsettings.thursday == 1)
+                {
+                    myoffdays2 = myoffdays2 + "4,";
+                }
+                if (jsonsettings.friday == 1)
+                {
+                    myoffdays2 = myoffdays2 + "5,";
+                }
+                if (jsonsettings.saturday == 1)
+                {
+                    myoffdays2 = myoffdays2 + "6,";
+                }
+                if (jsonsettings.sunday == 1)
+                {
+                    myoffdays2 = myoffdays2 + "0,";
+                }
+                myoffdays2 = myoffdays2.slice(0, -1);
+                //alert($("#advance-date-search" ).text());
+                $("#advance-date-search").datepicker({
+                    autoclose: true,
+                    daysOfWeekDisabled: myoffdays2, //data.offDays2,
+                }).on('changeDate', function (e) {
+                    datePag.datepaginator('setSelectedDate', $.datepicker.formatDate("yy-mm-dd", e.date));
+                });
+                portlet.on('click', '.close-gotodate-portlet', function () {
+                    portlet.fadeOut(500, function () {
+                        //portlet.remove();
+                        HelperFns.unblockUI(calendar.find('div.fc-toolbar'));
+                        HelperFns.unblockUI(button.closest('div.actions'));
+                    });
+                });
+                //},
+                //error: function () {
+                //    alert('Could not get gotodate tpl');
+                //}
+                //});
+            });
+        }
+    };
+    //$(document).ready(function () {
+    function LoadFullCalendarv261(mydefaultView, mydefaultDate, mykatastima, fkplugin) {
+        CALFKPLUGIN = fkplugin;
+        EVENTCLK = true;
+        var date = new Date();
+        var d = date.getDate();
+        var m = date.getMonth();
+        var y = date.getFullYear();
+        var myurlsettings = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM4, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'mykatastima' => 'mykatastimaforreplace', 'param1' => 'plugin', 'param2' => 'fullcalendar', 'param3' => 'getsettings', 'param4' => 'myfkpluginforreplace')); ?>";
+        var myurlevents = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM4, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'mykatastima' => 'mykatastimaforreplace', 'param1' => 'plugin', 'param2' => 'fullcalendar', 'param3' => 'getevents', 'param4' => 'myfkpluginforreplace')); ?>";
+        // save calendar obj
+        var calendar = $('#calendar-private');
+        var metadata = {};
+        var jsonsettings;
+        //console.log('fkplugin=' + fkplugin);
+        metadata['id'] = fkplugin;
+        if (checkIfParamIsNullOrUndefined(mykatastima) === true)
+        {
+            mykatastima = "<?php echo CHCrmCParams::My_get_mykatastima_default(); ?>";
+        }
+
+        myurlsettings = myurlsettings.replace('/mykatastimaforreplace/', '/' + mykatastima + '/');
+        myurlevents = myurlevents.replace('/mykatastimaforreplace/', '/' + mykatastima + '/');
+        myurlsettings = myurlsettings.replace('/myfkpluginforreplace/', '/' + fkplugin + '/');
+        myurlevents = myurlevents.replace('/myfkpluginforreplace/', '/' + fkplugin + '/');
+        // Get calendar settings
+        $.ajax({
+            //   url: "<?php echo $di->controller_params_array['html_base_path'] ?>template/b2badmin/theme/admin_1/vt2m_get_calendar_settings.php",
+            url: myurlsettings,
+            type: "POST",
+            async: false,
+            dataType: "json",
+            data: {
+                metadata: metadata
+            },
+            success: function (settings) {
+                jsonsettings = settings.params;
+                //if (mydefaultView == null || mydefaultView == undefined)
+                if (checkIfParamIsNullOrUndefined(mydefaultView) === true)
+                {
+                    mydefaultView = jsonsettings.defaultView;
+                }
+
+                calendar.fullCalendar({
+                    // LICENSE
+                    schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+                    columnFormat: jsonsettings.columnFormat, //'ddd DD/MM',
+                    lang: '<?php echo MyCustomHelperLng::My_get_current_lng_shortname(); ?>',
+                    customButtons: {
+                        addNewEvent: {
+                            text: '<?php echo \B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginFullCalendar::$AvailablePluginAliasName, 'NewEvent1'); ?>',
+                            click: function () {
+                                // DLS20161012
+                                var eventAddMode = '<?php echo \B2b\Models\CoreModels\DlB2bAdminFullCalendar::Get_Create_Event_Add_Mode(); ?>';
+                                var data = {
+                                    s: 'now',
+                                    sD: ''
+                                };
+                                if (eventAddMode === 'portlet') {
+                                    HelperFns.Calendar.Event.loadEventPortlet(data);
+                                } else if (eventAddMode === 'modal') {
+                                    HelperFns.Calendar.Event.loadMainModal(data);
+                                }
+                                // DLS20161012
+                            }
+                        }
+                    },
+                    // buttons for switching between views
+                    header: {
+                        left: jsonsettings.header.left, //'<?php echo $pluginarrparams['header']['left']; ?>', //'prev,today,month,agendaWeek,agendaDay,next',
+                        right: jsonsettings.header.right, //'<?php echo $pluginarrparams['header']['right']; ?>', //'addNewEvent',
+                        center: jsonsettings.header.center, //'<?php echo $pluginarrparams['header']['center']; ?>', //'title'
+                    }, // set all-day slot on - off.
+                    allDaySlot: jsonsettings.allDaySlot, //<?php echo $pluginarrparams['allDaySlot']; ?>, //settings.allDaySlot,
+                    allDayText: 'All Day',
+                    // slot duration
+                    slotDuration: jsonsettings.slotDuration, //'<?php echo $pluginarrparams['slotDuration']; ?>', //settings.slotDuration,
+                    // set default view
+                    defaultView: mydefaultView, //jsonsettings.defaultView, //'<?php echo $pluginarrparams['defaultView']; ?>', //settings.defaultView,
+                    // set default time formats
+                    slotLabelFormat: jsonsettings.axisFormat, //'<?php echo $pluginarrparams['axisFormat']; ?>', //settings.axisFormat, // format of time ('h:mm a' 12 hour)
+                    timeFormat: jsonsettings.axisFormat, //'<?php echo $pluginarrparams['axisFormat']; ?>', //settings.axisFormat,
+                    minTime: jsonsettings.minTime, //'<?php echo $pluginarrparams['minTime']; ?>', //settings.minTime, // starting of time
+                    maxTime: jsonsettings.maxTime, //'<?php echo $pluginarrparams['maxTime']; ?>', //settings.maxTime, // end of time
+                    scrollTime: jsonsettings.scrollTime, //'<?php echo $pluginarrparams['scrollTime']; ?>', //settings.scrollTime, // default view time, (must get current time and se it to there, or by user)                    
+                    hiddenDays: jsonsettings.hiddenDays, //<?php echo $pluginarrparams['hiddenDays']; ?>, //settings.hiddenDays, // hide days
+                    // turn on-off week days
+                    weekends: jsonsettings.Weekends, //<?php echo $pluginarrparams['Weekends']; ?>, //settings.weekends,
+                    // default start day
+                    firstDay: jsonsettings.firstDay, //'<?php echo $pluginarrparams['firstDay']; ?>', //settings.firstDay, // (0) Sunday
+                    // RESOURCES
+                    resources: jsonsettings.resources, //<?php echo $pluginarrparams['resources']; ?>, //settings.resources,
+                    // EVENTS //
+                    //events: "vt2m_events.php",
+                    //events: "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM4, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'param1' => 'plugin', 'param2' => 'fullcalendar', 'param3' => 'getevents', 'param4' => $pluginarrparams['id'])); ?>",
+                    events: [],
+                    slotEventOverlap: false, // Event overlap
+                    eventStartEditable: false, // An mporei na to kanei drag n' drop
+                    eventDrop: function (event, delta, revertFunc) {
+                        var eventTitle = event.title;
+                        var eventTimeStart = event.start.format();
+                        var eventTimeStop = event.end.format();
+                        if (!confirm(eventTitle + " was moved on " + eventTimeStart + "\nAre you sure about this change?")) {
+                            revertFunc();
+                        }
+                    },
+                    eventResize: function (event, delta, revertFunc) {
+                        var eventTitle = event.title;
+                        var eventTimeStart = event.start.format();
+                        var eventTimeStop = event.end.format();
+                        if (!confirm(eventTitle + " was expanded to " + eventTimeStop + "\nAre you sure about this change?")) {
+                            revertFunc();
+                        }
+                    },
+                    eventAfterRender: function (event, element, view) {
+                        if (view.name == 'agendaWeek' || view.name == 'agendaDay') {
+                            $('.fc-content', element).append(event.customers);
+                            $('.fc-content', element).append(event.trainers);
+                            $('.fc-content div.customer:first', element).css('border-top', '10');
+                            $('.fc-content div.customer:last', element).css('border-bottom', '15');
+                        }
+
+                        Dl.Calendar.renderEventWidth(calendar, element, view);
+                        Dl.Calendar.renderQuickTpls(calendar, element, view);
+                        Dl.Calendar.quickTplsEffect(event, element, true);
+                        Dl.Calendar.quickTplsListeners(event, element);
+                    },
+                    eventAfterAllRender: function () {
+                        // TODO: Mporei na min xreiazete
+                        calendar.find('div.fc-event-container').css('margin', '2px');
+                    },
+                    eventMouseover: function (event, jsEvent, view) {
+                        Dl.Calendar.showQuickTpls(calendar, $(this), view);
+                    },
+                    eventMouseout: function (event, jsEvent, view) {
+                        Dl.Calendar.hideQuickTpls(calendar, $(this), view);
+                    },
+                    viewRender: function (view) {
+                        Dl.Calendar.registerHovers(calendar);
+                        Dl.Calendar.registerMouseDUEffect(calendar);
+                        if (view.name === 'month') {
+                            var tpl = '&nbsp;&nbsp;<a class="calendar-zoom-to-week" style="color: #EF4836;" title="Zoom In"><span class="glyphicon glyphicon-eye-open"></span></a>';
+                            $('.fc-day-number').append(tpl);
+                        } else if (view.name === 'agendaWeek') {
+                            var tpl = '&nbsp;&nbsp;<a class="calendar-zoom-to-day" style="color: #EF4836;" title="Zoom In"><span class="glyphicon glyphicon-eye-open"></span></a>';
+                            $('.fc-day-header.fc-widget-header').append(tpl);
+                        } else if (view.name === 'agendaDay') {
+                            //var tpl = '&nbsp;&nbsp;<a class="calendar-view-day-events" style="color: #EF4836;" title="View Day Events"><span class="glyphicon glyphicon-list"></span></a>';
+                            //$('.fc-day-header.fc-widget-header').append(tpl);
+                        }
+                    },
+                    dayClick: function (x, y, z, k) {
+                        Dl.Calendar.dClick(k, x, y, z);
+                    },
+                    eventClick: function (event) {
+                        if (EVENTCLK) {
+                            var edit = {
+                                mode: 'edit',
+                                id: event.id
+                            };
+                            Dl.Calendar.EditCompleteEvent({}, edit);
+                        }
+                    }
+                });
+                Dl.Calendar.registerHovers(calendar);
+                Dl.Calendar.registerMouseDUEffect(calendar);
+                //if (mydefaultDate != null && mydefaultDate != undefined)
+                if (checkIfParamIsNullOrUndefined(mydefaultDate) === false)
+                {
+                    calendar.fullCalendar('gotoDate', mydefaultDate);
+                }
+
+            },
+            error: function () {
+                alert('Could not get calendar settings');
+            }
+        });
+        calendar.fullCalendar('addEventSource', myurlevents);
+        /*calendar.on('click', '.event-add-person', function () {
+         HelperFns.Calendar.eventAddPerson({element: $(this)});
+         });
+         calendar.on('click', '.event-remove-person', function () {
+         HelperFns.Calendar.eventRemovePerson({element: $(this)});
+         });
+         calendar.on('click', '.event-copy', function () {
+         HelperFns.Calendar.eventCopy({element: $(this)});
+         });
+         calendar.on('click', '.event-delete', function () {
+         HelperFns.Calendar.eventDelete({element: $(this)});
+         });*/
+
+        // Vazw listeners sta loipa buttons tou calendar 
+        calendar.on('click', '.calendar-zoom-to-week', function () {
+            var date = $(this).closest('td').attr('data-date');
+            calendar.fullCalendar('changeView', 'agendaWeek'); // Allazw to view
+            calendar.fullCalendar('gotoDate', date); // Pigenw sto date
+            App.scrollTop(); // Kanw scroll up
+        });
+        calendar.on('click', '.calendar-zoom-to-day', function () {
+            var date = $(this).closest('th').attr('data-date');
+            calendar.fullCalendar('changeView', 'agendaDay'); // Allazw to view
+            calendar.fullCalendar('gotoDate', date); // Pigenw sto date
+            App.scrollTop(); // Kanw scroll up
+        });
+        calendar.on('click', '.calendar-view-day-events', function () {
+            var calendarEvents = calendar.fullCalendar('clientEvents');
+            var clickedDate = $(this).closest('th').attr('data-date');
+            $.each(calendarEvents, function (key, value) {
+                console.log(value.start._i);
+            });
+        });
+        // Vazw loipa listeners sto calendar
+        /*calendar.on('mouseenter', 'td.fc-day', function() {
+         $(this).css('background-color','lightblue');
+         });
+         calendar.on('mouseleave', 'td.fc-day', function() {
+         $(this).css('background-color','');
+         });
+         calendar.on('mouseenter', 'td.fc-day-number', function() {
+         calendar.find('td.fc-day[data-date="'+$(this).attr('data-date')+'"]').css('background-color','lightblue');
+         });
+         calendar.on('mouseleave', 'td.fc-day-number', function() {
+         calendar.find('td.fc-day[data-date="'+$(this).attr('data-date')+'"]').css('background-color','');
+         });*/
+
+
+        /*$('#private-calendar-show-event-viewer').on('click', function() {
+         var button = $(this);
+         var portletViewer = $('#portlet-viewer-calendar-events');
+         var portletCalendar = $('#portlet-calendar');
+         $.ajax({
+         url: "vt2m_events_viewer.php",
+         type:"POST",
+         async: true,
+         success: function(result) {
+         portletCalendar
+         .removeClass('col-md-12')
+         .addClass('col-md-9')
+         .before((JSON.parse(result)).html);
+         HelperFns.btnCalendarViewerHelper();
+         button.fadeOut(250);
+         },
+         error: function() {
+         alert('Could not get event viewer tpl');
+         } 
+         });     
+         });*/
+        arrcals[fkplugin] = {};
+        arrcals[fkplugin]['jsonsettings'] = jsonsettings;
+        arrcals[fkplugin]['calendar'] = calendar;
+        arrcals[fkplugin]['mykatastima'] = mykatastima;
+        arrcals[fkplugin]['portletsettings'] = $('#portlet-settings');
+        //HelperFns.enableportletlisteners(calendar, jsonsettings, mykatastima, fkplugin);
+        //HelperFns.btnCalendarViewerHelper();
+        //});
+
+
+
+    }
+
+    $('html').delegate('#private-calendar-settings-btn', 'click', HelperFns.settings.btnShowClick);
+    $('html').delegate('#private-calendar-go-to-date-btn', 'click', HelperFns.btnGoToDateClick);
+
+//</script>

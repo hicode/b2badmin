@@ -1,0 +1,327 @@
+//<script>
+
+
+
+
+
+
+
+
+
+
+    var PpDashboard = {
+        SCMembersSuggestiongetTpl: function (myuid) {
+            var tpl = '<?php echo json_encode(B2b\Models\CoreModels\PpB2bAdminGeneralHelper::ppGet_AddSC_Search_Tpl()); ?>';
+            tpl = tpl.replace("{SCMembersSuggestion}", myuid);
+            return tpl;
+        },
+        SCMembersSuggestiongetUniq: function () {
+            var myuid = App.getUniqueID('SCMembersSuggestion');
+            return myuid;
+        },
+        SearchMember: function (obj) {
+            //DlDashboard.AddMembers();
+//            var $this = this;
+//            var SCOrigField = obj;
+            if (!obj)
+            {
+                obj = $("#SearchMember");
+            }
+            var SCOrigField = obj;
+            var myuid = PpDashboard.SCMembersSuggestiongetUniq();
+            var tpl = PpDashboard.SCMembersSuggestiongetTpl(myuid);
+            obj.replaceWith(tpl.substring(1, tpl.length - 1));
+            var membersSelection = $('#' + myuid);
+            $('.close-suggestion', membersSelection.closest('.suggestion-parent')).off('click').on('click', function () {
+                membersSelection.closest('.suggestion-parent').replaceWith(SCOrigField);
+            });
+            var murl = '<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM2, array('helperpage' => 'posts', 'param1' => 'action_suggestion', 'param2' => 'members')); ?>';
+            var suggestion = new Bloodhound({
+                datumTokenizer: function (data) {
+                    return data.tokens;
+                },
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: murl + '%QUERY/',
+                    wildcard: '%QUERY'
+                }
+            });
+            suggestion.initialize();
+
+
+            membersSelection.typeahead('destroy').typeahead(null, {
+                highlight: false,
+                displayKey: 'key',
+                hint: false,
+                source: suggestion.ttAdapter(),
+                limit: 10
+            });
+            membersSelection.bind('typeahead:select', function (ev, su) {
+                //$("#<?php echo \B2b\Models\CoreModels\PpB2bAdminGeneralHelper::Get_Dashboard_Container_Child_ID(); ?>").hide();
+                DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members')); ?>', '', function (data) {
+
+                    DlHelperContainer.addContetnsChildClean(data);
+                    runeveryinner();
+                    var MyModalInitPage = function () {
+                        Form1Click();
+                    };
+                    var MyModalOnClose = function () {
+                        //alert('close');
+                        grid.getDataTable().ajax.reload();
+                    };
+                    MyRunForm();
+                }, {dataType: "html",
+                    async: false});
+                $("#search-customerfull").val(membersSelection.val());
+                myajaxDatatables['<?php echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::$Datatable_Html_Name_Main; ?>'].submitFilter();
+                //$("#<?php echo \B2b\Models\CoreModels\PpB2bAdminGeneralHelper::Get_Dashboard_Container_Child_ID(); ?>").show();
+                var position = $("#<?php echo \B2b\Models\CoreModels\PpB2bAdminGeneralHelper::Get_Dashboard_Container_Child_ID(); ?>").position();
+                scroll(0, position.top);
+                membersSelection.closest('.suggestion-parent').replaceWith(SCOrigField);
+            });
+            return;
+        },
+        AddMember: function (obj) {
+            $("#searchmember").hide();
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => 'inner_home_crm_members')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+                $("#datatableajax-add-record").click();
+                $("#portlet-new-record").parent().next(".row").hide();
+                $(".close-new-record-portlet").hide();
+
+
+            }, {dataType: "html"});
+        },
+        AddMembers: function (obj) {
+            /*
+             PPS20161116
+             */
+            var myurl = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'mykatastima' => 'mykatastimaforreplace', 'param1' => 'inner_home_crm_members')); ?>";
+            var mykatastima = $("#addmembers").data("mykatastima");
+
+            myurl = myurl.replace('/mykatastimaforreplace/', '/' + mykatastima + '/');
+            /*
+             PPE20161116
+             */
+
+
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData(myurl, '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        SCShow: function (obj) {
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members_contracts_all')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        SCEnergesShow: function (obj) {
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members_contracts_energa_all')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html",
+                async: false});
+        },
+        SCEnergesVisitsOpenShow: function (obj) {
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members_contracts_energa_visits_open_all')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html",
+                async: false});
+        },
+        SCVisitsDoneShow: function (obj) {
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members_contracts_visits_done_all')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html",
+                async: false});
+        },
+        AddMembersEnerga: function (obj) {
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members_energa')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        AddMembersIpoloipo: function (obj) {
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members_ipoloipo')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        SCExpireInMonth: function (obj) {
+            /*
+             * PPS20161001
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members_scexpireinmonth')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        MembersIpoloipa: function (obj) {
+            /*
+             * PPS20161114
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members_ipoloipa')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+        MembersLixiprothesma: function (obj) {
+            /*
+             * PPS20161114
+             */
+            DlGeneralAjax.getAjaxData('<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => 'data-table-ajax-level1', 'param1' => 'inner_home_crm_members_lixiprothesma')); ?>', '', function (data) {
+                /*
+                 * PPE20161001
+                 */
+                DlHelperContainer.addContetnsChildClean(data);
+                runeveryinner();
+                var MyModalInitPage = function () {
+                    Form1Click();
+                };
+                var MyModalOnClose = function () {
+                    //alert('close');
+                    grid.getDataTable().ajax.reload();
+                };
+                MyRunForm();
+            }, {dataType: "html"});
+        },
+    };
+
+//</script>

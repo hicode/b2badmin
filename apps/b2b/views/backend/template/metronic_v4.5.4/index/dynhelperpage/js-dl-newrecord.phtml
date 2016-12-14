@@ -1,0 +1,890 @@
+//<script>
+    // DLS20161111
+    function Get_Mykatastima(def) {
+        if (def === false) {
+            var mykatastima = window.location.href.split('#')[1].split('/')[2];
+            return mykatastima;
+        } else {
+            return '<?php echo CHCrmCParams::My_get_mykatastima_default(); ?>';
+        }
+    };
+    
+    function Mykatastima () {  
+        var ret = '<?php echo CHCrmCParams::My_get_mykatastima_default(); ?>';
+        if( $('#mykatastima').length > 0 ) {
+            ret = $('#mykatastima').val();
+        }
+        return ret;
+    };
+
+    createDosesTable = function (doses) {
+        var dose = $('#cc_new_record_ypoloipo').val() / doses;
+        var currdt = new Date();
+        clearDosesContainer();
+        var tbl = '<?php echo json_encode(B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Doses_Main_Tbl()); ?>';
+        var rows = '';
+        for (var i = 1; i <= doses; i++) {
+            var row = '<?php echo json_encode(B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Doses_Single_Row_Data()); ?>';
+            row = row.substring(1, row.length - 1);
+            row = row.replace(new RegExp('<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Dose_Row_Num_Placeholder(); ?>', 'g'), i);
+            row = row.replace(new RegExp('<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Dose_Row_Date_Placeholder(); ?>', 'g'), moment(currdt).add(i, 'months').format('DD/MM/YYYY'));
+            row = row.replace(new RegExp('<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Dose_Row_Date_Db_Placeholder(); ?>', 'g'), moment(currdt).add(i, 'months').format('YYYY-MM-DD'));
+            row = row.replace(new RegExp('<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Dose_Row_Cost_Placeholder(); ?>', 'g'), dose.toPrecision(dose.toString().split('.')[0].length + 2));
+            rows += row;
+        }
+        tbl = tbl.replace('<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Doses_Tbody_Placeholder(); ?>', rows);
+        fillDosesContainer(tbl.substring(1, tbl.length - 1));
+    };
+
+    fillDosesContainer = function (html) {
+        $('#doses_container').append(html);
+    };
+
+    clearDosesContainer = function () {
+        $('#doses_container').empty();
+    };
+
+    initDosesSelection = function () {
+        $('#doses_selection option:first').attr('selected', 'selected');
+    };
+
+    initDoses = function (el) {
+        if ($('option:selected', el).attr('data-doses') == -1) {
+            clearDosesContainer();
+            return false;
+        }
+        var cost = $('#cc_new_record_cost').val();
+        if (cost != '' && typeof cost != 'undefined') {
+            var html = createDosesTable($('option:selected', el).attr('data-doses'));
+            fillDosesContainer(html);
+        } else {
+            toastrMsg('', '<span class="text-center"><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('selectcostfirsterrortitle') ?></span>', 'error');
+            initDosesSelection();
+            clearDosesContainer();
+        }
+    };
+
+    function calculateBalance(form) {
+        var fin = $('input[name="cc_new_record_cost"]', form).val() - $('input[name="cc_new_record_advancepayment"]', form).val() -
+                $('input[name="cc_new_record_discount"]', form).val();
+        return typeof parseFloat(fin) !== 'number' ? 0 : fin;
+    }
+    ;
+
+    var DlNewRecord = function (options) {
+        var defs = {
+            'ajax': {
+                'urlsave': '<?php
+$di = Phalcon\DI::getDefault();
+echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, [
+    'helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'],
+    'mykatastima' => 'mykatastimaforreplace',
+    'param1' => B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Post_Plugin(),
+    'param2' => B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Post_PluginName(),
+    'param3' => B2b\Models\CoreModels\DlB2bAdminMetronic454PluginNewRecord::Get_Post_PluginSaveAction()
+]);
+?>',
+                'async': false,
+                'type': "POST",
+                'dataType': "json",
+                'urlparams': false,
+                'doBeforeSend': function () {},
+                'doAfterComplete': function () {}
+            },
+            'extratplconcat': 'after',
+            'showtype': 'default',
+            'appendcontainer': '',
+            'page': '',
+            'pageparams': false,
+            'pageparamsvalues': {
+                'param1': 'none', // Reserved
+                'param2': 'none', // Reserved
+                'param3': 'none',
+                'param4': 'none',
+                'param5': 'none',
+                'param6': 'none'
+            },
+            'extratpl': '',
+            'animateonsave': false,
+            'animationonsavecontainer': $('html > body'),
+            'animationonsavemessage': '<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('savingrecordwaitmessagetitle'); ?>',
+            'scrollaftercancel': true,
+            'scrollaftercancelto': '',
+            'scrollaftersave': true,
+            'scrollaftersaveto': '',
+            'afterSave': '',
+            'afterCancel': '',
+            // TODO: Tmp data must fix
+            'extra': 0,
+            'pkfield': '',
+            'id': ''
+        };
+
+        // Vazw ta data pou peira apo user
+        var params = !$.isEmptyObject(options) ? $.extend({}, defs, options) : defs;
+
+        // Rest general data
+        var NLIMIT = -9999999999;
+        var PLIMIT = 9999999999;
+        var PKFIELD = options.pkfield;  // TODO: Na to valw apo alou
+        var NEWRECORDID = options.id; // TODO: Na to valw apo alou
+        // This obj
+        var $this = this;
+
+        var DlTypeahead = function (toptions) {
+            var tdefs = {
+                'url': '',
+                'el': '',
+                'tags': false,
+                'tagsel': '',
+                'afterSuggestionSelected': '',
+                'afterTagAdd': '',
+                'afterTagRemove': '',
+                'selected': {
+                    'suggestion': '',
+                    'suggestionid': '',
+                    'tags': [],
+                    'tagsid': []
+                }
+            };
+            var tparams = !$.isEmptyObject(toptions) ? $.extend({}, tdefs, toptions) : tdefs;
+//            var $tthis = this; Edw mporei na exw provlima me to tthis
+            return {
+                "Init": function () {
+
+                },
+                "actions": {
+                    "getSuggestionVal": function () {},
+                    "getSuggestionId": function () {},
+                    "getTagsVals": function () {},
+                    "getTagsIds": function () {}
+                }
+            };
+        };
+
+        save = function (data, form) {
+            $.ajax({
+                url: params.ajax.urlsave,
+                data: {
+                    'newrecorddata': data
+                },
+                async: params.ajax.async,
+                type: params.ajax.type,
+                dataType: params.ajax.dataType,
+                beforeSend: params.ajax.doBeforeSend,
+                complete: params.ajax.doAfterComplete,
+                success: function (result) {
+                    if (result.success == 1) {
+                        toastrMsg('', '<span class="text-center"><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('newrecordsavetitle') ?></span>', 'success');
+                        $this.afterSave();
+                    } else {
+                        toastrMsg('', '<span class="text-center"><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('errortitle') ?></span><br><span><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('codetitle') ?>: 1505</span>', 'error');
+                        $this.deleteNewRecord();
+                    }
+                },
+                error: function (a, b, c) {
+                    toastrMsg('', '<span class="text-center"><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('errortitle') ?></span><br><span><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('codetitle') ?>: 1500</span>', 'error');
+                    $this.deleteNewRecord();
+                    return false;
+                }
+            });
+        };
+
+        createSaveAnimation = function () {
+            App.blockUI({
+                'target': params.animationonsavecontainer
+            });
+        };
+
+        removeSaveAnimation = function () {
+            App.unblockUI({
+                'target': params.animationonsavecontainer
+            });
+        };
+
+        afterSave = function () {
+            if (params.showtype === 'default') {
+                $('#NewRecord').parent().empty();
+            } else {
+                $('#NewRecord').remove();
+            }
+
+            if (params.scrollaftersave) {
+                if ($.isEmptyObject(params.scrollaftersaveto)) {
+                    App.scrollTop();
+                } else {
+                    App.scrollTo(params.scrollaftersaveto);
+                }
+            }
+
+            if (typeof params.afterSave === 'function') {
+                params.afterSave();
+            }
+        };
+
+        deleteNewRecord = function () {
+            if (params.showtype === 'default') {
+                $('#NewRecord').parent().empty();
+            } else {
+                $('#NewRecord').remove();
+            }
+
+            if (params.scrollaftercancel) {
+                if ($.isEmptyObject(params.scrollaftercancelto)) {
+                    App.scrollTop();
+                } else {
+                    App.scrollTo(params.scrollaftercancelto);
+                }
+            }
+        };
+
+        getTpl = function (cb) {
+            DlGeneralAjax.getAjaxData(params.page, '', function (data) {
+                cb(data);
+            }, {"async": true});
+        };
+
+        fixGetTplURLParamsvalues = function () {
+            var urlparams = '';
+            $.each(params.pageparamsvalues, function (key, value) {
+                if (value != 'none') {
+                    urlparams += value + '/';
+                }
+            });
+            return urlparams;
+        };
+
+        fixGetTplURL = function () {
+            if (params.pageparams) {
+                var paramvalues = $this.fixGetTplURLParamsvalues()
+                params.page += paramvalues;
+            }
+        };
+
+        fixSaveURL = function () {
+            var mykatastima = Get_Mykatastima(false);
+            params.ajax.urlsave = params.ajax.urlsave.replace('/mykatastimaforreplace/', '/' + mykatastima + '/');
+        };
+
+        fixTpls = function (tpl) {
+            var ret = tpl;
+            if (params.extratpl !== '') {
+                if (params.extratplconcat === 'after') {
+                    ret = tpl + params.extratpl;
+                } else {
+                    ret = params.extratpl + tpl;
+                }
+            }
+            return ret;
+        };
+
+        fixDuration = function (duration) {
+            var minutes = duration[0];
+            var weeks = duration[1];
+            var days = duration[2];
+            var months = duration[3];
+            var ret = {
+                type: 'months',
+                by: 1
+            };
+            if (minutes > 0 && weeks == 0 && days == 0 && months == 0) {
+                ret = {
+                    type: 'days',
+                    by: 1
+                };
+            }
+            if (weeks > 0 && minutes == 0 && days == 0 && months == 0) {
+                ret = {
+                    type: 'days',
+                    by: weeks * 7
+                };
+            }
+            if (days > 0 && weeks == 0 && minutes == 0 && months == 0) {
+                ret = {
+                    type: 'days',
+                    by: days
+                };
+            }
+            if (months > 0 && weeks == 0 && minutes == 0 && days == 0) {
+                ret = {
+                    type: 'months',
+                    by: months
+                };
+            }
+            return ret;
+
+        };
+
+        showNewRecord = function (tplnewrecord) {
+            var fintpl = $this.fixTpls(tplnewrecord);
+            var type = params.showtype;
+            if (type === 'builtin') {
+                if ($('#NewRecord').length > 0) {
+                    $('#NewRecord').remove();
+                }
+                var container = $(params.appendcontainer);
+                container.children(":first").before(fintpl);
+                var form = $(params.form);
+                $this.initFormComponents(form);
+            } else {
+                DlHelperContainer.addContetnsChildClean(fintpl);
+                var form = $(params.form);
+                $this.initFormComponents(form);
+            }
+
+        };
+
+        getSaveExtraDataMultiple = function (form) {
+            var data = [];
+            $('.new-record-extra-data-records', form).each(function () {
+                var tmp = {
+                    actualdtpayment: $('.new-record-field-doses-date', $(this)).attr('data-dose-date'),
+                    actualpaymenttotal: $('.new-record-field-dose-cost', $(this)).attr('value'),
+                    fkpaymenttype: $('input[name="dosestype"]', form).attr('data-id'),
+                    fkpaymentreason: $('input[name="dosesreason"]', form).attr('data-id'),
+                    fkavailabletaxes: $('[name="cc_new_record_tax"] option:selected', form).attr('data-id')
+                };
+                data.push(tmp);
+            });
+            return data;
+        };
+
+        getSaveExtraDataSingle = function (form) {
+            return {};
+        };
+
+        getSaveData = function (form) {
+            // Kyriws data ( parent )
+            var data = {
+                table: $('#NewRecord').attr('data-writetbl'),
+                tablepk: $('#NewRecord').attr('data-writetblpk'),
+            };
+
+            if (params.extra == 1) {
+                data[PKFIELD] = NEWRECORDID;
+            }
+
+            // Mazeuw ta kyrios data
+            $('.new-record-field', form).each(function () {
+                var field = $(this);
+                var type = field.attr('data-type');
+                if (type === 'select') {
+                    data[field.attr('data-name')] = $('option:selected', field).attr('data-id');
+                } else if (type === 'simpletext') {
+                    data[field.attr('data-name')] = field.val();
+                } else if (type === 'integer' || type === 'number' || type === 'numberextracheckfield') {
+                    data[field.attr('data-name')] = field.val();
+                } else if (type === 'datepicker') {
+                    data[field.attr('data-name')] = field.data('datepicker').getFormattedDate('yyyy-mm-dd');
+                } else if (type === 'datetimepicker') {
+                    var time = field.val().split(' ')[1];
+                    var val = moment(field.datetimepicker("getDate")).format("YYYY-MM-DD");
+                    data[field.attr('data-name')] = val + " " + time + ":00";
+                } else if (type === 'simpletypeahead') {
+                    data[field.attr('data-name')] = field.attr('data-id');
+                } else if (type === 'booleancheckbox') {
+                    return false;
+                } else if (type === 'booleanswitch') {
+                    return false;
+                } else if (type === 'timepicker') {
+                    return false;
+                } else {
+                    return false;
+                }
+            });
+
+            // // //  Mazeuw ta extra data // // // // // // 
+            if ($('#NewRecord').attr('data-extra') == 1) {
+                var type = $('#NewRecord').attr('data-extra-write-type');
+                var records = {};
+                if (type == 'multiple') {
+                    records = this.getSaveExtraDataMultiple(form);
+                } else {
+                    records = this.getSaveExtraDataSingle(form);
+                }
+                var extra = {
+                    fkparent: $('#NewRecord').attr('data-extra-writetbl-fkparent'),
+                    table: $('#NewRecord').attr('data-extra-writetbl'),
+                    tablepk: $('#NewRecord').attr('data-extra-writetblpk')
+                };
+
+                // Elexw na dw an to extra data exei eggrafes mesa, an exei to stlenw 
+                // an den exei tote den to stelnw.
+                if (!$.isEmptyObject(records)) {
+                    if ($('[name="cc_new_record_advancepayment"]', form).val() != 0) {
+                        var tmp = {
+                            actualdtpayment: moment($('[name="cc_new_record_dtadvancepayment"]', form).datepicker('getDate')).format('YYYY-MM-DD'),
+                            actualpaymenttotal: $('[name="cc_new_record_advancepayment"]', form).val(),
+                            fkpaymenttype: $('[name="cc_new_record_paymenttype"] option:selected', form).attr('data-id'),
+                            fkpaymentreason: $('[name="cc_new_record_paymentreason"] option:selected', form).attr('data-id'),
+                            fkavailabletaxes: $('[name="cc_new_record_tax"] option:selected', form).attr('data-id')
+                        };
+                        records.push(tmp);
+                    }
+                    extra['records'] = records;
+                    data['extra'] = extra;
+                } else {
+                    if ($('[name="cc_new_record_advancepayment"]', form).val() != 0) {
+                        var recs = [];
+                        var tmp = {
+                            actualdtpayment: moment($('[name="cc_new_record_dtadvancepayment"]', form).datepicker('getDate')).format('YYYY-MM-DD'),
+                            actualpaymenttotal: $('[name="cc_new_record_advancepayment"]', form).val(),
+                            fkpaymenttype: $('[name="cc_new_record_paymenttype"] option:selected', form).attr('data-id'),
+                            fkpaymentreason: $('[name="cc_new_record_paymentreason"] option:selected', form).attr('data-id'),
+                            fkavailabletaxes: $('[name="cc_new_record_tax"] option:selected', form).attr('data-id')
+                        };
+                        recs.push(tmp);
+                        extra['records'] = recs;
+                        data['extra'] = extra;
+                    }
+                }
+            }
+            // // // // // // // // // // // // // // // // //           
+
+            return data;
+        };
+
+        getMessages = function (form) {
+            var messages = {};
+            $('.new-record-field-validation', form).each(function () {
+                messages[ $(this).attr('name') ] = $(this).attr('data-title-trans');
+            });
+            return messages;
+        };
+
+        getSelectAttrs = function (el) {
+            return {
+                type: 'select',
+                title: el.attr('data-title'),
+                name: el.attr('name'),
+                fname: el.attr('data-name'),
+                operator: el.attr('data-operator'),
+                validation: {
+                    required: el.attr('data-validation-required') == 1 ? true : false,
+                    selectcmp: el.attr('data-validation-selectcmp')
+                }
+            };
+        };
+
+        getSimpleTextAttrs = function (el) {
+            return {
+                type: 'simpletext',
+                title: el.attr('data-title'),
+                name: el.attr('name'),
+                fname: el.attr('data-name'),
+                validation: {
+                    required: el.attr('data-validation-required') == 1 ? true : false
+                }
+            };
+        };
+
+        getSimpleTypeaheadAttrs = function (el) {
+            return {
+                type: 'simpletypeahead',
+                title: el.attr('data-title'),
+                name: el.attr('name'),
+                fname: el.attr('data-name'),
+                validation: {
+                    required: el.attr('data-validation-required') == 1 ? true : false
+                }
+            };
+        };
+
+        getIntegerAttrs = function (el) {
+            return {
+                type: 'integer',
+                title: el.attr('data-title'),
+                name: el.attr('name'),
+                fname: el.attr('data-name'),
+                validation: {
+                    required: el.attr('data-validation-required') == 1 ? true : false,
+                    digits: el.attr('data-validation-digits') == 1 ? true : false,
+                    min: el.attr('data-validation-min') === 'nolimit' ? NLIMIT : el.attr('data-validation-min'),
+                    max: el.attr('data-validation-max') === 'nolimit' ? PLIMIT : el.attr('data-validation-max')
+                }
+            };
+        };
+
+        getNumberAttrs = function (el) {
+            return {
+                type: 'number',
+                title: el.attr('data-title'),
+                name: el.attr('name'),
+                fname: el.attr('data-name'),
+                validation: {
+                    required: el.attr('data-validation-required') == 1 ? true : false,
+                    number: el.attr('data-validation-number') == 1 ? true : false,
+                    min: el.attr('data-validation-min') === 'nolimit' ? NLIMIT : el.attr('data-validation-min'),
+                    max: el.attr('data-validation-max') === 'nolimit' ? PLIMIT : el.attr('data-validation-max')
+                }
+            };
+        };
+
+        getNumberExtracheckfieldAttrs = function (el) {
+            return {
+                type: 'numberextracheckfield',
+                title: el.attr('data-title'),
+                name: el.attr('name'),
+                fname: el.attr('data-name'),
+                validation: {
+                    required: el.attr('data-validation-required') == 1 ? true : false,
+                    number: el.attr('data-validation-number') == 1 ? true : false,
+                    min: el.attr('data-validation-min') === 'nolimit' ? NLIMIT : el.attr('data-validation-min'),
+                    numberecf: el.attr('data-validation-numberecf')
+                }
+            };
+        };
+
+        getTimepickerAttrs = function (el) {
+            return {};
+        };
+
+        getDatepickerAttrs = function (el) {
+            return {
+                type: 'datepicker',
+                title: el.attr('data-title'),
+                name: el.attr('name'),
+                fname: el.attr('data-name'),
+                validation: {
+                    required: el.attr('data-validation-required') == 1 ? true : false
+                }
+            };
+        };
+
+        getDatetimepickerAttrs = function (el) {
+            return {
+                type: 'datetimepicker',
+                title: el.attr('data-title'),
+                name: el.attr('name'),
+                fname: el.attr('data-name'),
+                validation: {
+                    required: el.attr('data-validation-required') == 1 ? true : false
+                }
+            };
+        };
+
+        getAttributes = function (el) {
+            if (el === '' || el === null || el === 'null' || typeof el == '') {
+                return {};
+            } else {
+                var type = el.attr('data-type');
+                if (type !== '') {
+                    if (type === 'select') {
+                        return this.getSelectAttrs(el);
+                    } else if (type === 'simpletext') {
+                        return this.getSimpleTextAttrs(el);
+                    } else if (type === 'simpletypeahead') {
+                        return this.getSimpleTypeaheadAttrs(el);
+                    } else if (type === 'integer') {
+                        return this.getIntegerAttrs(el);
+                    } else if (type === 'number') {
+                        return this.getNumberAttrs(el);
+                    } else if (type === 'numberextracheckfield') {
+                        return this.getNumberExtracheckfieldAttrs(el);
+                    } else if (type === 'timepicker') {
+                        return this.getTimepickerAttrs(el);
+                    } else if (type === 'datepicker') {
+                        return this.getDatepickerAttrs(el);
+                    } else if (type === 'datetimepicker') {
+                        return this.getDatetimepickerAttrs(el);
+                    } else {
+                        return {};
+                    }
+                } else {
+                    return {};
+                }
+            }
+        };
+
+        fixValidationMethods = function (methods) {
+            if (!$.isEmptyObject(methods)) {
+                var tmp = {};
+                $.each(methods, function (method, value) {
+                    tmp[method] = value;
+                });
+                return tmp;
+            } else {
+                return {};
+            }
+        };
+
+        getRules = function (form) {
+            var rules = {};
+            $('.new-record-field-validation', form).each(function () {
+                var attrs = $this.getAttributes($(this));
+                if (!$.isEmptyObject(attrs)) {
+                    rules[attrs.name] = $this.fixValidationMethods(attrs.validation);
+                }
+            });
+            return rules;
+        };
+
+        initExtraMethods = function () {
+            $.validator.addMethod("selectcmp", function (val, el) {
+                return eval($('select[name="' + $(el).attr('name') + '"] option:selected').attr('data-id') + " " + $(el).attr('data-operator') + " " + $(el).attr('data-validation-selectcmp')) ? true : false;
+            });
+            $.validator.addMethod("numberecf", function (val, el) {
+                val = val == '' || typeof val == 'undefined' ? 0 : val;
+                var el = $(el);
+                var tval = parseInt(eval(el.attr('data-validation-numberecf')));
+                if (typeof tval != 'number' || tval == 'NaN' || tval == null) {
+                    return false;
+                } else {
+                    return eval(parseInt(val) + " " + " " + $(el).attr('data-operator') + " " + tval);
+                }
+            });
+        };
+
+        intiNewRecordForm = function (form) {
+            form.validate({
+                errorElement: 'div',
+                errorClass: 'help-block help-block-error',
+                focusInvalid: false,
+                ignore: "new-record-field.ignore-new-record-field",
+                messages: this.getMessages(form),
+                rules: this.getRules(form),
+                highlight: function (element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                },
+                success: function (label) {
+                    label.closest('.form-group').removeClass('has-error');
+                },
+                submitHandler: function (form) {
+                    var data = $this.getSaveData(form);
+                    $this.save(data, form);
+                }
+            });
+        };
+
+        initDatePicker = function (form) {
+            var format = 'false'; // TODO: Na to parw apo settings
+            var mylng = '<?php echo MyCustomHelperLng::My_get_current_lng_shortname(); ?>';
+            $("input[name='cc_new_record_dtstart']", form).inputmask("d/m/y", {
+            }).datepicker({
+                autoclose: true,
+                isRTL: App.isRTL(),
+                todayBtn: false,
+                format: 'dd/mm/yyyy', // TODO: Na to parw apo settings
+                language: mylng,
+                keyboardNavigation: true
+            });
+            $("input[name='cc_new_record_dtend']", form).inputmask("d/m/y", {
+            }).datepicker({
+                autoclose: true,
+                isRTL: App.isRTL(),
+                todayBtn: false,
+                format: 'dd/mm/yyyy', // TODO: Na to parw apo settings
+                language: mylng,
+                keyboardNavigation: true
+            });
+            $("input[name='cc_new_record_dtadvancepayment']", form).inputmask("d/m/y", {
+            }).datepicker({
+                autoclose: true,
+                isRTL: App.isRTL(),
+                todayBtn: false,
+                format: 'dd/mm/yyyy', // TODO: Na to parw apo settings
+                language: mylng,
+                keyboardNavigation: true
+            }).datepicker("setDate", new Date());
+            $("input[name='cbirthday_new_record']", form).inputmask("d/m/y", {
+            }).datepicker({
+                autoclose: true,
+                isRTL: App.isRTL(),
+                todayBtn: false,
+                format: 'dd/mm/yyyy', // TODO: Na to parw apo settings
+                language: mylng,
+                keyboardNavigation: true
+            });
+            $("input[name='cc_new_record_payment_expenses_expensesdtpayment']", form).inputmask("d/m/y", {
+            }).datepicker({
+                autoclose: true,
+                isRTL: App.isRTL(),
+                todayBtn: false,
+                format: 'dd/mm/yyyy', // TODO: Na to parw apo settings
+                language: mylng,
+                keyboardNavigation: true
+            }).datepicker("setDate", new Date());
+            $("input[name='cc_new_record_dtstart']", form).off('change').on('change', function () {
+                var duration = $this.fixDuration($('[name="cc_new_record_packet"]').attr('data-duration').split('{###}'));
+                var dtstart = $('[name="cc_new_record_dtstart"]').datepicker('getDate');
+                $('[name="cc_new_record_dtend"]').datepicker('setDate', moment(dtstart).add(duration.by, duration.type).format('DD/MM/YYYY'));
+            });
+        };
+
+        initDateTimePicker = function (form) {
+            var time = 24; //TODO: Na to parw apo settings
+            var mylng = '<?php echo MyCustomHelperLng::My_get_current_lng_shortname(); ?>';
+            var format = "dd/mm/yyyy hh:ii"; // 12 hour = dd/mm/yyyy HH:ii P, 24 hour = dd/mm/yyyy hh:ii
+            var meridian = false;   // true = 12 hour, false = 24 hour
+            if ( time == 12 ) {
+                format = "dd/mm/yyyy HH:ii P";
+                meridian = true
+            }
+            $("input[name='cc_new_record_payment_actualdtpayment']", form).datetimepicker({
+                isRTL: App.isRTL(),
+                format: format,
+                showMeridian: meridian,
+                autoclose: true,
+                todayBtn: false,
+                pickerPosition: (App.isRTL() ? "bottom-right" : "bottom-left"),
+                minuteStep: 15,
+                language: mylng,
+                keyboardNavigation: true
+            }).datetimepicker("setDate", new Date());
+        };
+
+        initTypeahead = function (form) {
+            /*var packetTypeahed = $('input[name="cc_new_record_packet"]', form);
+             var murl = '<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM2, array('helperpage' => 'inner_home_crm_calendar_managment', 'param1' => 'action_suggestion', 'param2' => 'contractpackets')); ?>';
+             var suggestion = new Bloodhound({
+             datumTokenizer: function (data) {
+             return data.tokens;
+             },
+             queryTokenizer: Bloodhound.tokenizers.whitespace,
+             remote: {
+             url: murl + '%QUERY/',
+             wildcard: '%QUERY'
+             }
+             });
+             suggestion.initialize();
+             packetTypeahed.typeahead(null, {
+             highlight: false,
+             displayKey: 'key',
+             hint: false,
+             source: suggestion.ttAdapter(),
+             limit: 20
+             });
+             packetTypeahed.bind('typeahead:select', function (ev, su) {
+             var id = su.id;
+             var packetid = id.split('{##}')[0];
+             var parousies = id.split('{##}')[1];
+             var price = id.split('{##}')[2];
+             var duration = id.split('{##}')[3];
+             packetTypeahed.attr('data-total-times', parousies);
+             packetTypeahed.attr('data-duration', duration);
+             packetTypeahed.attr('data-id', packetid);
+             packetTypeahed.attr('data-packet-price', price);
+             $('input[name="cc_new_record_parousies"]', form).val(parousies);
+             $('input[name="cc_new_record_cost"]', form).val(price);
+             var balance = calculateBalance(form);
+             $('input[name="cc_new_record_ypoloipo"]', form).val(balance);
+             duration = $this.fixDuration(duration.split('{###}'));
+             $('[name="cc_new_record_dtstart"]').datepicker('setDate' ,moment(new Date()).format('DD/MM/YYYY') );
+             $('[name="cc_new_record_dtend"]').datepicker('setDate' ,moment(new Date()).add(duration.by, duration.type).format('DD/MM/YYYY') );
+             suggestion.initialize();
+             });*/
+        };
+
+        initTimePicker = function (field) {
+            return false;
+        };
+
+        initTmpListeners = function (form) {
+            // New Contract
+            $('[name="cc_new_record_packet"]', form).off('change').on('change', function () {
+                initDosesSelection();
+                clearDosesContainer();
+                var sel = $(this);
+                if ($('option:selected', sel).attr('data-id') != -1) {
+                    var id = $('option:selected', sel).attr('data-custom-id');
+                    var packetid = id.split('{##}')[0];
+                    var parousies = id.split('{##}')[1];
+                    var price = id.split('{##}')[2];
+                    var duration = id.split('{##}')[3];
+                    var service = id.split('{##}')[4];
+                    sel.attr('data-total-times', parousies);
+                    sel.attr('data-duration', duration);
+                    sel.attr('data-id', packetid);
+                    sel.attr('data-packet-price', price);
+                    $('input[name="cc_new_record_parousies"]', form).val(parousies);
+                    $('input[name="cc_new_record_cost"]', form).val(price);
+                    var balance = calculateBalance(form);
+                    $('input[name="cc_new_record_ypoloipo"]', form).val(balance);
+                    $('[name="cc_new_record_total_minutes"]', form).val(duration.split('{###}')[0]);
+                    $('[name="cc_new_record_total_weeks"]', form).val(duration.split('{###}')[1]);
+                    $('[name="cc_new_record_total_days"]', form).val(duration.split('{###}')[2]);
+                    $('[name="cc_new_record_total_months"]', form).val(duration.split('{###}')[3]);
+                    $('[name="cc_new_record_service"]', form).val(service);
+                    duration = $this.fixDuration(duration.split('{###}'));
+                    $('[name="cc_new_record_dtstart"]', form).datepicker('setDate', moment(new Date()).format('DD/MM/YYYY'));
+                    $('[name="cc_new_record_dtend"]', form).datepicker('setDate', moment(new Date()).add(duration.by, duration.type).format('DD/MM/YYYY'));
+                }
+                $('input[name="cc_new_record_ypoloipo"]', form).val(calculateBalance(form));
+            });
+            $('input[name="cc_new_record_cost"], input[name="cc_new_record_advancepayment"], input[name="cc_new_record_discount"]', form).on('keyup', function () {
+                $('input[name="cc_new_record_ypoloipo"]', form).val(calculateBalance(form));
+                clearDosesContainer();
+                initDosesSelection();
+            }).on('focus click', function () {
+                $(this).select();
+            });
+            $('[name="cc_new_record_payment_energessyndromes"]', form).on('change', function () {
+                var remaining = $('[name="cc_new_record_payment_remaining"]', form);
+                var pays = $('[name="cc_new_record_payment_cost"]', form);
+                var cost = $('[name="cc_new_record_payment_contract_total_cost"]', form);
+                var conData = $('option:selected', $(this)).attr('data-custom-id');
+                var rem = conData.split('{#}')[0];
+                var tot = conData.split('{#}')[1];
+                remaining.attr('data-remain', rem);
+                cost.val(tot);
+                pays.val('');
+                remaining.val('');
+            });
+            $('[name="cc_new_record_payment_cost"]', form).on('keyup', function () {
+                var remaining = parseFloat($('[name="cc_new_record_payment_remaining"]', form).attr('data-remain'));
+                var payment = parseFloat($(this).val());
+                if ($.isNumeric(remaining) && $.isNumeric(payment)) {
+                    payment > remaining ? $(this).val(remaining) : '';
+                }
+            });
+            // New packet
+            $('[name="cc_new_record_packet_service"], [name="cc_new_record_packet_duration"], [name="cc_new_record_packet_times"]', form).on('change', function () {
+                var servicetitle = $('[name="cc_new_record_packet_service"] option:selected', form).attr('data-id') > 0 ? $('[name="cc_new_record_packet_service"] option:selected', form).text() : '';
+                var durationtitle = $('[name="cc_new_record_packet_duration"] option:selected', form).attr('data-id') > 0 ? $('[name="cc_new_record_packet_duration"] option:selected', form).text() : '';
+                var parousiestitle = $('[name="cc_new_record_packet_times"] option:selected', form).attr('data-id') > 0 ? $('[name="cc_new_record_packet_times"] option:selected', form).text() : '';
+                var fintitle = servicetitle + ' ' + durationtitle + ' ' + parousiestitle;
+                $('[name="cc_new_record_packet_title"]', form).val(fintitle);
+            });
+        };
+
+        initClose = function (form) {
+            $('.close-form-btn', form).off('click').on('click', function () {
+                $this.deleteNewRecord();
+                if (typeof params.afterCancel === 'function') {
+                    params.afterCancel();
+                }
+            });
+        };
+
+        initFormComponents = function (form) {
+            $this.initClose(form);
+            $this.intiNewRecordForm(form);
+            $this.initDatePicker(form);
+            $this.initDateTimePicker(form);
+            $this.initTimePicker(form);
+            //$this.initTypeahead(form);
+
+            // Temporary listenerss
+            $this.initTmpListeners(form);
+
+            // Always run for extra methods and validations
+            $this.initExtraMethods(form);
+
+            // Scroll to form
+            App.scrollTo(form);
+        };
+
+        return {
+            "Init": function () {
+                $this.fixSaveURL();
+                $this.fixGetTplURL();
+                $this.getTpl($this.showNewRecord);
+            }
+        };
+
+    };
+
+//</script>

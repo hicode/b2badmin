@@ -1,0 +1,8 @@
+<?php
+// DLS20161111
+$di = \Phalcon\DI::getDefault();
+if ($di->controller_params_array['printtype'] === 'PDF') {
+    isset($di->controller_params_array['pdfurl']) ? header("Location: " . $di->controller_params_array['pdfurl']) : die();
+} else {
+    echo $di->controller_params_array['pdftpl'];
+}

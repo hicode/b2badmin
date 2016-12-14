@@ -1,0 +1,76 @@
+//<script>
+    var DlDeleteRecord = function (options) {
+        var defs = {
+            ajax: {
+                urldelete: '<?php
+$di = Phalcon\DI::getDefault();
+echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM2, array(
+    'helperpage' => 'delete_record',
+    'param1' => B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Post_Plugin_Delete_Single_Record_Action(),
+    'param2' => B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Delete_Record_Helper_Page())
+);
+?>',
+                async: false,
+                type: "POST",
+                dataType: "json"
+            },
+            element: '',
+            afterDelete: ''
+        };
+        var params = !$.isEmptyObject(options) ? $.extend({}, defs, options) : defs;
+
+        var $this = this;
+
+        getData = function () {
+            var ret = {};
+            if (!$.isEmptyObject(params.element)) {
+                ret = {
+                    'id': params.element.attr('data-id'),
+                    'lng': params.element.attr('data-lng'),
+                    'delete': params.element.attr('data-delete')
+                };
+            }
+            return ret;
+        };
+
+        deleteRecord = function () {
+            $this.removeConfirmation();
+            var data = $this.getData();
+            $.ajax({
+                url: params.ajax.urldelete + (data.lng + '/' + data.id + '/' + data.delete + '/'),
+                async: params.ajax.async,
+                type: params.ajax.type,
+                dataType: params.ajax.dataType,
+                success: function (result) {
+                    if (result.success == 1) {
+                        toastrMsg('', result.msg, 'success');
+                        if( typeof params.afterDelete === 'function' ) {
+                            params.afterDelete(params.element);
+                        }
+                    } else {
+                        toastrMsg('', result.msg, 'error');
+                    }
+                },
+                error: function () {
+                    toastrMsg('', '<span class="text-center"><?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::$AvailablePluginAliasName, 'errorondeletetitle') ?></span><br><span><?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::$AvailablePluginAliasName, 'codetitle') ?>: DL1705</span>', 'error');
+                }
+            });
+        };
+
+        removeConfirmation = function () {
+            params.element.confirmation('hide');
+        };
+        
+        setData = function (el) {
+            params.element = el;
+        };
+        
+        return {
+            "Delete": function (el) {
+                $this.setData(el);
+                $this.deleteRecord();
+            }
+        };
+
+    };
+//</script>

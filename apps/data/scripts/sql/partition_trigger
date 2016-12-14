@@ -1,0 +1,55 @@
+CREATE OR REPLACE FUNCTION
+phalconphpschema.tr_erp_str_function()
+RETURNS TRIGGER AS 
+$BODY$
+DECLARE
+_new_year text;
+_new_month text;
+_new_katastima text;
+_table_name text;
+_result record;
+BEGIN
+--Takes the current inbound "time" value and determines when midnight is for the given date
+_new_year := left(new.mydateoffpar, 4);
+_new_month := substr(new.mydateoffpar, 5,2);
+_new_katastima := new.mykatastima;
+_table_name :='core_erp_str_'||_new_katastima||'_'||_new_year||'_'||_new_month;
+RAISE NOTICE '%', _table_name;
+-- Check if the partition needed for the current record exists
+PERFORM 1
+FROM   pg_catalog.pg_class c
+JOIN   pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+WHERE  c.relkind = 'r'
+AND    c.relname = _table_name
+AND    n.nspname = 'phalconphpschema';
+
+-- If the partition needed does not yet exist, then we create it:
+-- Note that || is string concatenation (joining two strings to make one)
+IF NOT FOUND THEN
+EXECUTE 'CREATE TABLE phalconphpschema.' || quote_ident(_table_name) || ' (
+CHECK ( left(new.mydateoffpar, 4) =  ' || quote_literal(_new_year) || '
+AND substr(new.mydateoffpar, 5,2) = ' || quote_literal(_new_month) || ')
+
+) INHERITS (phalconphpschema.core_erp_str)';
+
+-- Table permissions are not inherited from the parent.
+-- If permissions change on the master be sure to change them on the child also.
+--EXECUTE 'ALTER TABLE phalconphpschema.' || quote_ident(_table_name) || ' OWNER TO postgres';
+--EXECUTE 'GRANT ALL ON TABLE phalconphpschema.' || quote_ident(_table_name) || ' TO phalconphpuser';
+
+-- Indexes are defined per child, so we assign a default index that uses the partition columns
+--EXECUTE 'CREATE INDEX ' || quote_ident(_table_name||'_indx1') || ' ON phalconphpschema.' || quote_ident(_table_name) || ' ( id)';
+END IF;
+
+-- Insert the current record into the correct partition, which we are sure will now exist.
+EXECUTE 'INSERT INTO phalconphpschema.' || quote_ident(_table_name) || ' VALUES ($1).*' USING NEW;
+RETURN NULL;
+END;
+$BODY$
+LANGUAGE plpgsql;
+
+
+
+CREATE TRIGGER tr_erp_str_tr
+BEFORE INSERT ON phalconphpschema.core_erp_str
+FOR EACH ROW EXECUTE PROCEDURE phalconphpschema.tr_erp_str_function();

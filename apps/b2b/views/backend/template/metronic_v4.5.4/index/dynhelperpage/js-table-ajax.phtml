@@ -1,0 +1,516 @@
+<?php
+$di = Phalcon\DI::getDefault();
+//$assetspath = $di->controller_params_array['template']['template_admin_path_assets'];
+//$mainurl_for_data = MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Data_Table_Ajax_Page'], 'param1' => $di->controller_params_array['viewarr']['pageurl']));
+//$mainurl_for_data_details = MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM2, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Data_Table_Ajax_Page'], 'param1' => $di->controller_params_array['viewarr']['pageurl'] . '_details', 'param2' => $di->controller_params_array['settings']['Action_View']));
+//'/'.$di->controller_params_array['lng'].'/b2b/admin/dynhelperpage/'.$di->controller_params_array['settings']['Helper_Page_Data_Table_Ajax_Page'].'/'.$di->controller_params_array['viewarr']['pageurl'].'/';
+?>
+//<script>
+    function handleActionRowTab(alertdivid, msg)
+    {
+        App.alert({container: alertdivid,
+            place: "append",
+            type: "success",
+            message: msg,
+            close: 1,
+            reset: 1,
+            focus: 1,
+            closeInSeconds: 5,
+            icon: "warning",
+        });
+    }
+    function getData2(mycolspan, dataid, urldetails, extrasearch, callback) {
+
+        $.ajax({
+            url: urldetails + '?' + extrasearch,
+            type: "POST",
+            dataType: "json",
+            async: true,
+            data: {
+                dataID: dataid,
+                myColSpan: mycolspan
+            },
+            success: function (result) {
+                callback(result);
+            },
+            error: function () {
+                //alert('Error fetching table tpl_2');
+                toastrMsg('', 'Error fetching table tpl_2', 'error');
+                callback('<tr class="custom-details"><td class="custom-details" colspan="10" style="outline: 3px solid grey;">ERROR</td></tr>');
+            }
+        });
+    }
+
+    function disableTabPortlet(tabportlet)
+    {
+        if (tabportlet.hasClass("red"))
+        {
+            tabportlet.toggleClass('red green-meadow');
+        }
+        tabportlet.closest('tr').find('li.tab-pane.active').children('a').each(function () {
+            $(this).css('color', '');
+        });
+        hideSaveCancel(tabportlet);
+        tabportlet.find('input[type="checkbox"].custom-hide').attr('disabled', 'disabled').removeClass('custom-hide');
+        tabportlet.find('input.custom-hide').attr('readonly', true).removeClass('custom-hide');
+        tabportlet.find('input.date-picker').attr('disabled', 'disabled').removeClass('custom-hide');
+        tabportlet.find('select.bs-select.custom-hide').attr('disabled', 'disabled').removeClass('custom-hide');
+        tabportlet.find('input.customswitch').bootstrapSwitch('disabled', true);
+        ComponentsPickers.init();
+        tabportlet.find(".form_datetime").datetimepicker('disable');
+        tabportlet.find(".input-group-btn").hide();
+    }
+
+
+
+    function enableTabPortlet(tabportlet)
+    {
+        if (tabportlet.hasClass("green-meadow"))
+        {
+            tabportlet.toggleClass('red green-meadow');
+        }
+        tabportlet.closest('tr').find('li.tab-pane.active').children('a').each(function () {
+            $(this).css('color', 'red');
+        });
+        showSaveCancel(tabportlet);
+        tabportlet.find('input[type="checkbox"]').addClass('custom-hide').removeAttr('disabled');
+        tabportlet.find('input[readonly]').addClass('custom-hide').removeAttr('readonly');
+        tabportlet.find('input.date-picker').addClass('custom-hide').removeAttr('disabled');
+        tabportlet.find('select.bs-select').addClass('custom-hide').removeAttr('disabled');
+        //tab.find('.bootstrap-switch-readonly').addClass('custom-hidebootstrap').removeClass('bootstrap-switch-readonly');
+        tabportlet.find('input.customswitch').bootstrapSwitch('disabled', false);
+        //App.unblockUI(nav_tab);
+        ComponentsPickers.init();
+        tabportlet.find(".form_datetime").datetimepicker('enable');
+        tabportlet.find(".input-group-btn").show();
+    }
+
+    function hideSaveCancel(tabportlet)
+    {
+        var save = tabportlet.find('a.custom-save-class');
+        var close = tabportlet.find('a.custom-cancel-class');
+        var edit = tabportlet.find('a.custom-edit-class');
+        var time = 0;
+        save.fadeOut(time);
+        close.fadeOut(time);
+        edit.fadeIn(time)
+    }
+
+    function showSaveCancel(tabportlet)
+    {
+        var save = tabportlet.find('a.custom-save-class');
+        var close = tabportlet.find('a.custom-cancel-class');
+        var edit = tabportlet.find('a.custom-edit-class');
+        var time = 0;
+        save.fadeIn(time);
+        close.fadeIn(time);
+        edit.fadeOut(time)
+    }
+
+    function tabPortletReload(tabportlet)
+    {
+        var alertdivid = "#" + tabportlet.prev('div.mybootstrap_alert_tab').attr('id');
+
+        disableTabPortlet(tabportlet);
+        tabportlet.find('a.reload').click();
+        //tabportlet.find('a.collapse').trigger('click');
+        tabportlet.find('a.expand').trigger('click');
+        tabportlet.find('a.custom-edit-class').unbind();
+        tabportlet.find('a.custom-edit-class').on('click', function () {
+            tabportlet.find('a.expand').trigger('click');
+            enableTabPortlet(tabportlet);
+        });
+        tabportlet.find('a.custom-cancel-class').unbind();
+        tabportlet.find('a.custom-cancel-class').on('click', function () {
+            tabPortletReload(tabportlet);
+            //disableTabPortlet(tabportlet);
+            toastrMsg('', '<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('theoperationhasbeencancelledsuccesfully1'); ?>', 'info');
+            //handleActionRowTab(alertdivid, 'The operation has been canceled succesfully!!!');
+
+        });
+        tabportlet.find('a.custom-save-class').unbind();
+        tabportlet.find('a.custom-save-class').on('click', function () {
+            var data = {};
+            var metadata = {};
+            var alert_divid = alertdivid;
+            var alert_msg = '<?php echo \B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Thefieldsupdatedsuccesfully1'); ?>';
+            var alert_icon = "check";
+            var alert_type = "success";
+            var identityclass = 'myformdetailfield-' + tabportlet.attr('id');
+            var alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('unkownerrorduringsave1'); ?>';
+            var alert_type = "error";
+            var mykatastima = $(this).data("mykatastima");
+            var mysaveurl = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'mykatastima' => 'mykatastimaforreplace', 'param1' => 'plugin', 'param2' => 'datatablesdetailstable', 'param3' => 'savedata')); ?>";
+            mysaveurl = mysaveurl.replace('/mykatastimaforreplace/', '/' + mykatastima + '/');
+
+            $('input[type="checkbox"].' + identityclass).each(function () {
+                data[$(this).attr('name')] = $(this).prop('checked');
+            });
+            $('select.bs-select.' + identityclass).each(function () {
+                data[$(this).attr('name')] = $(this).val();
+            });
+            $('input[type="text"].' + identityclass).each(function () {
+                data[$(this).attr('name')] = $(this).val();
+            });
+            $('input[type="hidden"].' + identityclass).each(function () {
+                data[$(this).attr('name')] = $(this).val();
+            });
+
+
+
+            $.ajax({
+                url: mysaveurl, //"<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'param1' => 'plugin', 'param2' => 'datatablesdetailstable', 'param3' => 'savedata')); ?>",
+                type: "POST",
+                async: true,
+                dataType: "json",
+                data: {
+                    mydata: data
+                },
+                success: function (result) {
+                    if (result.status === '1') {
+                        alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('successsavedata1'); ?>';
+                        alert_type = "success";
+                        tabPortletReload(tabportlet);
+                        //disableTabPortlet(tabportlet);
+                    } else {
+                        alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('errorduringsave1'); ?>';
+                        alert_type = "error";
+                    }
+                    toastrMsg('', alert_msg, alert_type);
+
+                },
+                error: function () {
+                    alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('unkownerrorduringsave1'); ?>';
+                    alert_type = "error";
+                    toastrMsg('', alert_msg, alert_type);
+                }
+            });
+
+        });
+
+    }
+
+
+
+    var TableAjax = function () {
+        var blenableportletlisteners = false;
+        var grid;
+        var table_list;
+
+        var initPickers = function () {
+            //init date pickers
+            $('.date-picker').datepicker({
+                rtl: App.isRTL(),
+                autoclose: true
+            });
+        }
+
+
+        var handleRecords = function (datatablehtmlname, mainurl, mylocalaoColumns, extrasearch, col, sort, pagelength, lengthmenukeys, lengthmenuvalues) {
+            mainurl = getMainUrl(mainurl);
+            grid = new Datatable();
+            table_list = $('#' + datatablehtmlname);
+            myajaxDatatables[datatablehtmlname] = grid;
+            //myajaxDatatables.push({datatablehtmlname: grid});
+            var gridinitparams = {
+                src: table_list,
+                exporturlexcel: mainurl + '<?php echo $di->controller_params_array['settings']['Export_To_Excel'] . '/?'; ?>' + extrasearch,
+                exporturlopenofficecalc: mainurl + '<?php echo $di->controller_params_array['settings']['Export_To_Open_Office_Calc'] . '/?'; ?>' + extrasearch,
+                exporturlpdf: mainurl + '<?php echo $di->controller_params_array['settings']['Export_To_Pdf'] . '/?'; ?>' + extrasearch,
+                exporturlcsv: mainurl + '<?php echo $di->controller_params_array['settings']['Export_To_Csv'] . '/?'; ?>' + extrasearch,
+                exporturlxml: mainurl + '<?php echo $di->controller_params_array['settings']['Export_To_Xml'] . '/?'; ?>' + extrasearch,
+                onSuccess: function (grid) {
+                    // execute some code after table records loaded
+                },
+                onError: function (grid) {
+                    alert('error');
+                    // execute some code on network or other general error  
+                },
+                onDataLoad: function (a, b) {
+                    // Vgazw to diko tou onclick listener.
+                    // Vgazw ta dika tou sort class exei kai vazw ena diko mou custom-sorting
+                    // Vazw kai enan cursor indicator
+                    //var table = grid.getTable();
+                    table_list.find('tr.heading th')
+                            .unbind('click');
+                },
+                loadingMessage: 'Loading...',
+                dataTable: {
+                    // here you can define a typical datatable settings from http://datatables.net/usage/options 
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js). 
+                    // So when dropdowns used the scrollable div should be removed. 
+                    //"dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
+                    "bStateSave": false,
+                    // save datatable state(pagination, sort, etc) in cookie.
+                    //Pan Pan start fix confirmation  11/06/2015
+                    fnDrawCallback: function () {
+                        executeIfFunctionExist('handleBootstrapConfirmation');
+                        UIGeneral.init();
+                    },
+                    //DLS20161102
+                    rowCallback: function (row) {
+                        var del = DlDeleteRecord({
+                            //DLS20161103
+                            afterDelete: function (btn) {
+                                btn.closest('tr').fadeOut(500, function() {
+                                    table_list.DataTable().ajax.reload();
+                                });
+                            }
+                            //DLE20161003
+                        });
+                        $('.mydatatablerowbtn.deleterecord', row).confirmation({
+                            singleton: true,
+                            onConfirm: function () {
+                                del.Delete($(this));
+                            },
+                            title: '<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Delete_Confirmation_Title(); ?>',
+                            btnOkClass: '<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Delete_Confirmation_Button_Ok_Class(); ?>',
+                            btnCancelClass: '<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Delete_Confirmation_Button_Cancel_Class(); ?>',
+                            btnOkIcon: '<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Delete_Confirmation_Button_Ok_Icon(); ?>',
+                            btnCancelIcon: '<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Delete_Confirmation_Button_Cancel_Icon(); ?>',
+                            btnOkLabel: '<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Delete_Confirmation_Button_Ok_Label(); ?>',
+                            btnCancelLabel: '<?php echo B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Delete_Confirmation_Button_Cancel_Label(); ?>',
+                            template: <?php echo json_encode(B2b\Models\CoreModels\DlB2bAdminMetronic454PluginDeleteRecord::Get_Delete_Confirmation_Template()); ?>
+                        });
+                    },
+                    //DLE20161102
+                    //Pan Pan end fix confirmation  11/06/2015
+                    //aoColumns : myaoColumns,
+                    "lengthMenu": [
+                        lengthmenukeys.split(","),
+                        lengthmenuvalues.split(",") // change per page values here
+                    ],
+                    "pageLength": pagelength, // default record count per page
+                    "ajax": {
+                        "url": mainurl + '<?php echo $di->controller_params_array['settings']['Action_View'] . '/?'; ?>' + extrasearch, // ajax source
+                    },
+                    "order": [
+                        [col, sort]
+                    ] // set first column as a default sort by asc
+                }
+            };
+            if (checkIfParamIsNullOrUndefined(mylocalaoColumns) === false)
+            {
+                gridinitparams["dataTable"]["aoColumns"] = mylocalaoColumns;
+            } else if (typeof myaoColumns !== 'undefined')
+            {
+                gridinitparams["dataTable"]["aoColumns"] = myaoColumns;
+            }
+            grid.init(gridinitparams);
+            // handle group actionsubmit button click
+            grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
+                e.preventDefault();
+                var action = $(".table-group-action-input", grid.getTableWrapper());
+                if (action.val() != "" && grid.getSelectedRowsCount() > 0) {
+                    grid.setAjaxParam("customActionType", "group_action");
+                    grid.setAjaxParam("customActionName", action.val());
+                    grid.setAjaxParam("id", grid.getSelectedRows());
+                    grid.getDataTable().ajax.reload();
+                    grid.clearAjaxParams();
+                } else if (action.val() == "") {
+                    App.alert({
+                        type: 'danger',
+                        icon: 'warning',
+                        message: 'Please select an action',
+                        container: grid.getTableWrapper(),
+                        place: 'prepend'
+                    });
+                } else if (grid.getSelectedRowsCount() === 0) {
+                    App.alert({
+                        type: 'danger',
+                        icon: 'warning',
+                        message: 'No record selected',
+                        container: grid.getTableWrapper(),
+                        place: 'prepend'
+                    });
+                }
+            });
+        }
+        var getMainUrl = function (mainurl) {
+//            if (checkIfParamIsNullOrUndefined(mainurl) === true)
+//            {
+//                mainurl = '<?php //echo $mainurl_for_data;                                        ?>';
+//            }
+            return mainurl;
+        }
+        var getUrlDetails = function (urldetails) {
+//            if (checkIfParamIsNullOrUndefined(urldetails) === true)
+//            {
+//                urldetails = '<?php //echo $mainurl_for_data_details;                                        ?>';
+//            }
+            return urldetails;
+        }
+        var blockUI = function (target) {
+            App.blockUI({
+                target: target != '' ? target : 'html',
+                boxed: false,
+                animate: false,
+                message: ' ',
+                textOnly: true,
+                iconOnly: false
+            });
+        }
+        var unblockUI = function (target) {
+            App.unblockUI(target != '' ? target : 'html');
+        }
+        // DLS20161031
+        var enableportletlisteners = function () {
+            //alert(blenableportletlisteners);
+            //if (blenableportletlisteners === false)
+            //{
+            //blenableportletlisteners = true;
+            $('.datatableajax-add-record').off('click').on('click', function () {
+                // DLS20161111 olo to listener
+                var btn = $(this);
+                btn.attr('disabled', true);
+                var mykatastima = btn.attr('data-mykatastima');
+                var pagename = "<?php
+echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM1, array(
+    'helperpage' => 'new_record', 'mykatastima' => 'mykatastimaforreplace',
+    'param1' => B2b\Models\CoreModels\PpB2bAdminMetronic454PluginNewRecord::Get_Post_PluginGetNewRecordTplAction())
+);
+?>";
+                pagename = pagename.replace('/mykatastimaforreplace/', '/' + mykatastima + '/');
+                var newrecordata = {
+                    page: pagename + btn.attr('data-newrecord') + '_new/',
+                    pageparams: btn.attr('data-pageparams') === undefined ? false : btn.attr('data-pageparams'),
+                    pageparamsvalues: {
+                        'param3': btn.attr('data-pageparamthree') === undefined ? 'none' : btn.attr('data-pageparamthree'),
+                        'param4': btn.attr('data-pageparamtfour') === undefined ? 'none' : btn.attr('data-pageparamtfour'),
+                        'param5': btn.attr('data-pageparamtfive') === undefined ? 'none' : btn.attr('data-pageparamtfive'),
+                        'param6': btn.attr('data-pageparamsix') === undefined ? 'none' : btn.attr('data-pageparamsix')
+                    },
+                    form: '.dl-cc-new-record',
+                    showtype: 'builtin',
+                    appendcontainer: btn.closest('div.portlet').parent(), // to container prepei na exei col-md-12 class
+                    scrollaftercancel: false,
+                    scrollaftersave: true,
+                    scrollaftersaveto: btn,                    
+                    afterSave: function () {
+                        $('#' + btn.attr('data-table-id')).DataTable().ajax.reload();
+                        btn.attr('disabled', false);
+                    },
+                    afterCancel: function () {
+                        btn.attr('disabled', false);
+                    },
+                    extra: btn.attr('data-extra') === undefined ? 0 : btn.attr('data-extra'),
+                    pkfield: btn.attr('data-pkfield') === undefined ? '' : btn.attr('data-pkfield'),
+                    id: btn.attr('data-id') === undefined ? '' : btn.attr('data-id')
+                };//$('#datatable_ajax')
+                // Trigger New Recrod
+                var newrecord = DlNewRecord(newrecordata);
+                newrecord.Init();
+            });
+//            $('.mydatatablerowbtn.deleterecord').on('click', function() {
+//                var button = $(this);
+//                console.log(button);
+//            });
+
+            //}
+        };
+        // DLE20161031
+        var handleEvents = function (urldetails, extrasearch) {
+            urldetails = getUrlDetails(urldetails);
+            // To event gia to click tou ( + ) to pianw edw.
+            var table_group = grid.getTable();
+            table_group.find('.date-picker').datepicker({
+                rtl: App.isRTL(),
+                autoclose: true
+            });
+            table_group.on('click', ' tbody td .row-details,tbody td .myrow-details', function () {
+                var trgrid = $(this).closest('tr');
+                // An exei class row-details-close tote prepei na to anoiksw.
+                if ($(this).hasClass('row-details-close')) {
+                    $(this).removeClass('row-details-close').addClass('row-details-open');
+                } else if ($(this).hasClass('myrow-details-close')) {
+                    $(this).removeClass('myrow-details-close').addClass('myrow-details-open');
+                    $(this).removeClass('fa-plus-circle').addClass('fa-minus-circle');
+                } else if ($(this).hasClass('row-details-open')) {
+                    $(this).removeClass('row-details-open').addClass('row-details-close');
+                } else if ($(this).hasClass('myrow-details-open')) {
+                    $(this).removeClass('myrow-details-open').addClass('myrow-details-close');
+                    $(this).removeClass('fa-minus-circle').addClass('fa-plus-circle');
+                }
+                if ($(this).hasClass('row-details-open') || $(this).hasClass('myrow-details-open')) {
+                    // Edw to kleinw.
+                    // Prwta vgazw to class close kai vazw to open
+                    //$(this).removeClass('row-details-close').addClass('row-details-open');
+                    // Pernw ta data gia to row , stin sinartisi stelnw to id, kai san callback
+                    // exw ta data.
+
+                    var dataid = $(this).attr('id');
+                    var mycolspan = $(this).attr('mycolspan');
+                    getData2(mycolspan, dataid, urldetails, extrasearch, function (data) {
+                        var portlet = $('#portlet_details_' + dataid);
+                        var portlettitle = $('#portlet_details_title_' + dataid);
+                        var msg = '<?php echo \B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('Errorduringfetchingdata1'); ?>';
+                        if (checkIfParamIsNullOrUndefined(data) === false)
+                        {
+                            msg = data.msg;
+                            if (data.success == 1)
+                            {
+                                trgrid.after(data.tr); // Vazw ta data
+                                tr = $('#' + data.tr_id);
+                                App.scrollTo(tr, -60);
+                                //newRowEnableOnClick(tr);
+                                tr.find('.childportlet').each(function () {
+                                    tabPortletReload($(this));
+                                });
+                                tr.find('.parentportlet').each(function () {
+                                    $(this).find('a.expand').trigger('click');
+                                });
+
+                            } else
+                            {
+                                toastrMsg('11', msg, 'error');
+                                //handleActionRowTab(alertgeneraldivid, msg);
+                            }
+                        } else
+                        {
+                            toastrMsg('22', msg, 'error');
+                            //handleActionRowTab(alertgeneraldivid, msg);
+                        }
+
+                    });
+
+                }
+                // An exei class row-details-open tote prepei na to kleisw.
+                else if ($(this).hasClass('row-details-close') || $(this).hasClass('myrow-details-close')) {
+                    tr = $('#tr_details_' + $(this).attr('id'));
+                    // Edw to anoigw.
+                    // Prwta vgazw to class x-x-open kai vazw to x-x-close
+                    //$(this).removeClass('row-details-open').addClass('row-details-close');
+                    if (tr.hasClass('details')) {
+                        tr.fadeOut(350, function () {
+                            tr.remove();
+                        });
+                        App.scrollTo(tr);
+                    }
+                }
+                // Edw exei kati allo. (TODO: Na kanw swsto troubleshoot.
+                else {
+                    alert('other');
+                }
+            });
+
+        }
+        return {
+            //main function to initiate the module
+            init: function (datatablehtmlname, mylocalaoColumns, mainurl, urldetails, extrasearch, col, sort, pagelength, lengthmenukeys, lengthmenuvalues) {
+                extrasearch = (checkIfParamIsNullOrUndefined(extrasearch) ? "" : extrasearch);
+                col = (checkIfParamIsNullOrUndefined(col) ? 3 : col);
+                sort = (checkIfParamIsNullOrUndefined(sort) ? 'asc' : sort);
+                pagelength = (checkIfParamIsNullOrUndefined(pagelength) ? 20 : pagelength);
+                pagelength = parseInt(pagelength);
+                lengthmenukeys = (checkIfParamIsNullOrUndefined(lengthmenukeys) ? '10,20,50,100,150,250,500,-1' : lengthmenukeys);
+                lengthmenuvalues = (checkIfParamIsNullOrUndefined(lengthmenuvalues) ? '10,20,50,100,150,250,500,All' : lengthmenuvalues);
+                initPickers();
+                handleRecords(datatablehtmlname, mainurl, mylocalaoColumns, extrasearch, col, sort, pagelength, lengthmenukeys, lengthmenuvalues);
+                handleEvents(urldetails, extrasearch);
+                enableportletlisteners();
+            }
+        };
+
+    }();
+//</script>

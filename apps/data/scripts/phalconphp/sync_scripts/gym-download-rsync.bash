@@ -1,0 +1,2 @@
+rsync -arvz --delete --exclude 'nbproject' --exclude '*.tar.gz' root@telecon-vps1:/usr/share/pp/gym/ /home/panosp/NetBeansProjects/gymdl/ 
+rsync -arvz /home/panosp/NetBeansProjects/gymdl/apps/b2b/models/CoreModels/Dl* /home/panosp/NetBeansProjects/gym/apps/b2b/models/CoreModels/

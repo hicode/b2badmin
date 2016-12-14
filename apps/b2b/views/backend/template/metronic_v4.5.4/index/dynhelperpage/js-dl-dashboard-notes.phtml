@@ -1,0 +1,192 @@
+<?php
+$di = \Phalcon\DI::getDefault();
+?>
+//<script>
+    // DL_TODO: Na dw mipos valw diaforetika ta listeners.
+    $('html').delegate('li.dropdown.dashboard-notes-dropdown', 'click', function (e) {
+        e.stopPropagation();
+    });
+    $('html').delegate('#notes_body_container a.new-note', 'click', function (e) {
+        if (!$.isEmptyObject($(this))) {
+            DlDashboardNotes.Update($(this));
+        } else {
+            return false;
+        }
+    });
+    var DlDashboardNotes = {
+        vars: {
+            notesbadgecount: 'notes_badge_count',
+            notesbodycontainer: 'notes_body_container',
+            btnaddcontainerid: 'notes_button_add_note_container',
+            btnsavecancelcontainerid: 'notes_save_cancel_note_container',
+            btnadd: 'add-note',
+            btnsave: 'save-note',
+            btncancel: 'cancel-note',
+            show: 1,
+            hide: 1,
+            remove: 1,
+            confirm: 250
+        },
+        getNotesBadgeContainer: function () {
+            return $('#' + this.vars.notesbadgecount);
+        },
+        getNotesBodyContainer: function () {
+            return $('#' + this.vars.notesbodycontainer);
+        },
+        getButtonAddContainer: function () {
+            return $('#' + this.vars.btnaddcontainerid);
+        },
+        getButtonSaveCancelContainer: function () {
+            return $('#' + this.vars.btnsavecancelcontainerid);
+        },
+        getButtonAdd: function () {
+            return $('#' + this.vars.btnadd);
+        },
+        getButtonSave: function () {
+            return $('#' + this.vars.btnsave);
+        },
+        getButtonCancel: function () {
+            return $('#' + this.vars.btncancel);
+        },
+        badgeEffect: function (badge, flag) {
+            if (flag) {
+                $(badge).pulsate({
+                    color: "#3598dc",
+                    reach: 50,
+                    repeat: 3,
+                    speed: 25,
+                    glow: true
+                });
+            }
+
+        },
+        showButtonAddContainer: function () {
+            this.getButtonAddContainer().fadeIn(this.vars.show);
+        },
+        hideButtonAddContainer: function () {
+            this.getButtonAddContainer().fadeOut(this.vars.hide);
+        },
+        showButtonSaveCancelContainer: function () {
+            this.getButtonSaveCancelContainer().fadeIn(this.vars.show);
+        },
+        hideButtonSaveCancelContainer: function () {
+            this.getButtonSaveCancelContainer().fadeOut(this.vars.hide);
+        },
+        getAddTplInner: function () {
+            var tpl = '<li class="new-note"><a href="javascript:;" style="padding: 10px;"><span class="message"><textarea class="text-to-add form-control" style="width: 100%; resize: none;"></textarea></span></a></li>';
+            return tpl;
+        },
+        addTpl: function (tpl) {
+            if( $('li', this.getNotesBodyContainer()).length > 0 ) {
+                this.getNotesBodyContainer().children(':first').before(tpl);
+            } else {
+                this.getNotesBodyContainer().append(tpl);
+            }
+            $('.text-to-add', this.getNotesBodyContainer()).focus();
+        },
+        removeAddTpl: function () {
+            var container = this.getNotesBodyContainer();
+            $('li.new-note', container).fadeOut(this.vars.remove, function () {
+                $('li.new-note', container).remove();
+            });
+        },
+        processAllowedNotes: function () {
+            var len = $('li', this.getNotesBodyContainer()).length;
+            var allowed = '<?php echo B2b\Models\CoreModels\DlB2bAdminNotesHelper::Get_Max_Allowed_Notes(); ?>';
+            if (len == allowed) {
+                $('li:last', this.getNotesBodyContainer()).remove();
+            }
+        },
+        processManagmentAction: function (action, result, data, note) {
+            if (action == '<?php echo B2b\Models\CoreModels\DlB2bAdminNotesHelper::$SaveAction ?>') {
+                if (result.status == '0') {
+                    toastrMsg('', '<span class="text-center"><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('erroronsavingnotestitle') ?></span><br><span><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('codetitle') ?>: ' + result.status_code + '</span>', 'error');
+                } else {
+                    this.processAllowedNotes();
+                    if( $('li', this.getNotesBodyContainer()).length > 0 ) {
+                        $('li:first', this.getNotesBodyContainer()).before(result.newnote);
+                    } else {
+                        this.getNotesBodyContainer().append(result.newnote);
+                    }
+                    var badge = $(this.getNotesBadgeContainer(), this.getNotesBodyContainer());
+                    badge.empty().append(result.newbadge);
+                    this.badgeEffect(badge, true);
+                }
+            } else if (action == '<?php echo B2b\Models\CoreModels\DlB2bAdminNotesHelper::$UpdateAction ?>') {
+                var self = this;
+                var badge = $(this.getNotesBadgeContainer(), this.getNotesBodyContainer());
+                badge.text( badge.text() - 1 );
+                note.child.removeClass('new-note').addClass('viewed-note');
+                note.confirm.fadeOut(self.vars.confirm, function() {
+                    note.child.fadeIn(self.vars.confirm);
+                    $('.viewed-note-helper', note.child).fadeIn();
+                });
+            } else {
+                return
+            }
+        },
+        managment: function (action, data, note) {
+            var self = this;
+<?php $mypage = MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => B2b\Models\CoreModels\DlB2bAdminNotesHelper::$helperPage)); ?>
+            var myurl = '<?php echo $mypage; ?>' + action + '/';
+            $.ajax({
+                url: myurl,
+                type: 'POST',
+                async: true,
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                    self.processManagmentAction(action, result, data, note);
+                },
+                error: function () {
+                    // TODO : Na dw ti kanw stin periptwsi pou exw error apo ajax request.
+                }
+            });
+        },
+        Add: function () {
+            this.showButtonSaveCancelContainer();
+            this.hideButtonAddContainer();
+            this.addTpl(this.getAddTplInner());
+        },
+        Save: function () {
+            var container = this.getNotesBodyContainer();
+            var el = $('.text-to-add', container);
+            var text = el.val();
+            if (text != '') {
+                this.managment('<?php echo B2b\Models\CoreModels\DlB2bAdminNotesHelper::$SaveAction; ?>', {
+                    note: text
+                });
+                this.Cancel();
+            } else {
+                this.Cancel();
+            }
+        },
+        Update: function (child) {
+            var self = this;
+            var confirm = $('.update-state-confirmation', $(child).closest('li'));
+            child.fadeOut(self.vars.confirm, function () {
+                confirm.fadeIn(self.vars.confirm, function () {
+                    $('.save-update', confirm).off('click').on('click', function() {
+                        self.managment('<?php echo B2b\Models\CoreModels\DlB2bAdminNotesHelper::$UpdateAction ?>', {
+                            id: child.attr('id')
+                        }, {
+                            child: child,
+                            confirm: confirm
+                        });
+                    });
+                    $('.cancel-update', confirm).off('click').on('click', function () {
+                        confirm.fadeOut(self.vars.confirm, function () {
+                            child.fadeIn(self.vars.confirm);
+                        });
+                    });
+                });
+            });
+        },
+        Cancel: function () {
+            this.removeAddTpl();
+            this.hideButtonSaveCancelContainer();
+            this.showButtonAddContainer();
+        }
+    };
+
+//</script>

@@ -1,0 +1,324 @@
+<?php
+$di = Phalcon\DI::getDefault();
+?>
+<?php $assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path']; ?>
+//<script>
+    var Login = function () {
+        var showLogin = function () {
+            jQuery('.login-form').show();
+            jQuery('.register-form').hide();
+            jQuery('.forget-form').hide();
+        }
+        var showRegistration = function () {
+            jQuery('.login-form').hide();
+            jQuery('.register-form').show();
+            jQuery('.forget-form').hide();
+        }
+        var showForget = function () {
+            jQuery('.login-form').hide();
+            jQuery('.register-form').hide();
+            jQuery('.forget-form').show();
+        }
+        var handleLogin = function () {
+
+            $('.login-form').validate({
+                errorElement: 'span', //default input error message container
+                errorClass: 'help-block', // default input error message class
+                focusInvalid: false, // do not focus the last invalid input
+                rules: {
+                    username: {
+                        required: true
+                    },
+                    password: {
+                        required: true
+                    },
+                    remember: {
+                        required: false
+                    }
+                },
+                messages: {
+                    username: {
+                        required: "Username is required."
+                    },
+                    password: {
+                        required: "Password is required."
+                    }
+                },
+                invalidHandler: function (event, validator) { //display error alert on form submit   
+                    $('.alert-danger', $('.login-form')).show();
+                },
+                highlight: function (element) { // hightlight error inputs
+                    $(element)
+                            .closest('.form-group').addClass('has-error'); // set error class to the control group
+                },
+                success: function (label) {
+                    label.closest('.form-group').removeClass('has-error');
+                    label.remove();
+                },
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.closest('.input-icon'));
+                },
+                submitHandler: function (form) {
+                    form.submit(); // form validation success, call ajax form submit
+                }
+            });
+
+            $('.login-form input').keypress(function (e) {
+                if (e.which == 13) {
+                    if ($('.login-form').validate().form()) {
+                        $('.login-form').submit(); //form validation success, call ajax form submit
+                    }
+                    return false;
+                }
+            });
+        }
+
+        var handleForgetPassword = function () {
+            $('.forget-form').validate({
+                errorElement: 'span', //default input error message container
+                errorClass: 'help-block', // default input error message class
+                focusInvalid: false, // do not focus the last invalid input
+                ignore: "",
+                rules: {
+                    email: {
+                        required: true,
+                        email: true
+                    }
+                },
+                messages: {
+                    email: {
+                        required: "Email is required."
+                    }
+                },
+                invalidHandler: function (event, validator) { //display error alert on form submit   
+
+                },
+                highlight: function (element) { // hightlight error inputs
+                    $(element)
+                            .closest('.form-group').addClass('has-error'); // set error class to the control group
+                },
+                success: function (label) {
+                    label.closest('.form-group').removeClass('has-error');
+                    label.remove();
+                },
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.closest('.input-icon'));
+                },
+                submitHandler: function (form) {
+                    form.submit();
+                }
+            });
+
+            $('.forget-form input').keypress(function (e) {
+                if (e.which == 13) {
+                    if ($('.forget-form').validate().form()) {
+                        $('.forget-form').submit();
+                    }
+                    return false;
+                }
+            });
+
+            jQuery('#forget-password').click(function () {
+                showForget();
+            });
+
+            jQuery('#back-btn').click(function () {
+                showLogin();
+            });
+
+        }
+
+        var handleRegister = function () {
+            function myResetForm()
+            {
+                $(".register-form").find('input[type=text]').each(function () {
+                    $(this).val('');
+                });
+                $(".register-form").find('input[type=select]').each(function () {
+                    $(this).val('');
+                });
+            }
+            function mySubmitFormRegister()
+            {
+                var myurl = "<?php echo \MyCustomHelperPages::makePage(\CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM2, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'param1' => 'userregister', 'param2' => rand(1000, 100000))); ?>"
+
+                var data = JSON.stringify($(".register-form").serializeArray());//$('.register-form').serialize();
+                $.ajax({
+                    url: myurl,
+                    type: "POST",
+                    async: true,
+                    dataType: "json",
+                    data: {
+                        formdata: data
+                    },
+                    success: function (result) {
+                        alert_msg = result.msg;
+                        if (result.success == 1) {
+                            alert_type = "success";
+                            Login.showLogin();
+                            myResetForm();
+                        } else
+                        {
+                            //resetform(false);
+                            alert_type = "warning";
+
+                        }
+                        toastrMsg('', alert_msg, alert_type);
+
+                    },
+                    error: function () {
+                        //resetform(false);
+                        alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('errorduringregisteringuser'); ?>';
+                        alert_type = "error";
+                        toastrMsg('', alert_msg, alert_type);
+                    }
+                });
+                return false;
+            }
+            function format(state) {
+                if (!state.id) {
+                    return state.text;
+                }
+                var $state = $(
+                        '<span><img src="<?php echo $$assetspath; ?>global/img/flags/' + state.element.value.toLowerCase() + '.png" class="img-flag" /> ' + state.text + '</span>'
+                        );
+
+                return $state;
+            }
+
+            if (jQuery().select2 && $('#myfkcountryshorttiltle').size() > 0) {
+                $("#myfkcountryshorttiltle").select2({
+                    placeholder: '<i class="fa fa-map-marker"></i>&nbsp;Select a Country',
+                    templateResult: format,
+                    templateSelection: format,
+                    width: 'auto',
+                    escapeMarkup: function (m) {
+                        return m;
+                    }
+                });
+
+
+                $('#myfkcountryshorttiltle').change(function () {
+                    $('.register-form').validate().element($(this)); //revalidate the chosen dropdown value and show error or success message for the input
+                });
+            }
+
+            $('.register-form').validate({
+                errorElement: 'span', //default input error message container
+                errorClass: 'help-block', // default input error message class
+                focusInvalid: false, // do not focus the last invalid input
+                ignore: "",
+                rules: {
+                    fname: {
+                        required: true
+                    },
+                    lname: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    address: {
+                        required: true
+                    },
+                    city: {
+                        required: true
+                    },
+                    myfkcountryshorttiltle: {
+                        required: true
+                    },
+                    username: {
+                        required: true
+                    },
+                    userpassword: {
+                        required: true
+                    },
+                    rpassword: {
+                        equalTo: "#userpassword"
+                    },
+                    tnc: {
+                        required: true
+                    }
+                },
+                messages: {// custom messages for radio buttons and checkboxes
+                    tnc: {
+                        required: "Please accept TNC first."
+                    }
+                },
+                invalidHandler: function (event, validator) { //display error alert on form submit   
+
+                },
+                highlight: function (element) { // hightlight error inputs
+                    $(element)
+                            .closest('.form-group').addClass('has-error'); // set error class to the control group
+                },
+                success: function (label) {
+                    label.closest('.form-group').removeClass('has-error');
+                    label.remove();
+                },
+                errorPlacement: function (error, element) {
+                    if (element.attr("name") == "tnc") { // insert checkbox errors after the container                  
+                        error.insertAfter($('#register_tnc_error'));
+                    } else if (element.closest('.input-icon').size() === 1) {
+                        error.insertAfter(element.closest('.input-icon'));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                submitHandler: function (form) {
+                    //form.submit();
+                    mySubmitFormRegister();
+                }
+            });
+
+            $('.register-form input').keypress(function (e) {
+                if (e.which == 13) {
+                    if ($('.register-form').validate().form()) {
+                        mySubmitFormRegister();
+
+                    }
+                    return false;
+                }
+            });
+
+            jQuery('#register-btn').click(function () {
+                showRegistration();
+            });
+
+            jQuery('#register-back-btn').click(function () {
+                showLogin();
+            });
+        }
+
+        return {
+            showLogin: function () {
+                showLogin();
+
+            },
+            showRegistration: function () {
+                showRegistration();
+
+            },
+            showForget: function () {
+                showForget();
+
+            },
+            //main function to initiate the module
+            init: function () {
+
+                handleLogin();
+                handleForgetPassword();
+                handleRegister();
+
+            }
+
+        };
+
+    }();
+
+    jQuery(document).ready(function () {
+        Login.init();
+    });
+
+//</script>

@@ -1,0 +1,186 @@
+var PortletDraggable = function () {
+
+    return {
+        //main function to initiate the module
+        init: function () {
+
+            if (!jQuery().sortable) {
+                return;
+            }
+
+            $("#sortable_portlets__").sortable({
+                connectWith: ".portlet",
+                items: ".portlet", 
+                opacity: 0.8,
+                coneHelperSize: true,
+                placeholder: 'portlet-sortable-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: "pointer",
+                helper: "clone",
+                tolerance: "pointer",
+                forcePlaceholderSize: !0,
+                helper: "clone",
+                cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
+                revert: 250, // animation in milliseconds
+                update: function(b, c) {
+                    if (c.item.prev().hasClass("portlet-sortable-empty")) {
+                        c.item.prev().before(c.item);
+                    }                    
+                }
+            });
+            //Start Pan Pan 17/4/2015 
+            $("#modrow__").sortable({
+                connectWith: ".portlet",
+                items: ".portlet", 
+                opacity: 0.8,
+                coneHelperSize: true,
+                placeholder: 'portlet-sortable-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: "pointer",
+                helper: "clone",
+                tolerance: "pointer",
+                forcePlaceholderSize: !0,
+                helper: "clone",
+                cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
+                revert: 250, // animation in milliseconds
+                update: function(b, c) {
+                    if (c.item.prev().hasClass("portlet-sortable-empty")) {
+                        c.item.prev().before(c.item);
+                    }                    
+                }
+            });
+            $("#modcol__").sortable({
+                connectWith: ".portlet",
+                items: ".portlet", 
+                opacity: 0.8,
+                coneHelperSize: true,
+                placeholder: 'portlet-sortable-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: "pointer",
+                helper: "clone",
+                tolerance: "pointer",
+                forcePlaceholderSize: !0,
+                helper: "clone",
+                cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
+                revert: 250, // animation in milliseconds
+                update: function(b, c) {
+                    if (c.item.prev().hasClass("portlet-sortable-empty")) {
+                        c.item.prev().before(c.item);
+                    }                    
+                }
+            });
+            $('[class*=" modcol__"]').sortable({
+                connectWith: ".portlet",
+                items: ".portlet", 
+                opacity: 0.8,
+                coneHelperSize: true,
+                placeholder: 'portlet-sortable-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: "pointer",
+                helper: "clone",
+                tolerance: "pointer",
+                forcePlaceholderSize: !0,
+                helper: "clone",
+                cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
+                revert: 250, // animation in milliseconds
+                update: function(b, c) {
+                    if (c.item.prev().hasClass("portlet-sortable-empty")) {
+                        c.item.prev().before(c.item);
+                    }                    
+                }
+            });
+            $('[class*=" modpiece__"]').sortable({
+                connectWith: ".portlet",
+                items: ".portlet", 
+                opacity: 0.8,
+                coneHelperSize: true,
+                placeholder: 'portlet-sortable-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: "pointer",
+                helper: "clone",
+                tolerance: "pointer",
+                forcePlaceholderSize: !0,
+                helper: "clone",
+                cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
+                revert: 250, // animation in milliseconds
+                update: function(b, c) {
+                    if (c.item.prev().hasClass("portlet-sortable-empty")) {
+                        c.item.prev().before(c.item);
+                    }                    
+                }
+            });
+            $('#modrow .mod-sortable-list-row').sortable({
+		connectWith: '#modrow .mod-sortable-list-row',
+                //items: ".portlet", 
+                opacity: 0.8,
+                coneHelperSize: true,
+                placeholder: 'portlet-sortable-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: "pointer",
+                helper: "clone",
+                tolerance: "pointer",
+                forcePlaceholderSize: !0,
+                helper: "clone",
+                cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
+                revert: 250, // animation in milliseconds
+                update: function(b, c) {
+                    my_portlet_update($(this),b,c);
+                }
+            });
+            $('#modrow .mod-sortable-list-group').sortable({
+		connectWith: '#modrow .mod-sortable-list-group',
+                //items: ".portlet", 
+                opacity: 0.8,
+                coneHelperSize: true,
+                placeholder: 'portlet-sortable-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: "pointer",
+                helper: "clone",
+                tolerance: "pointer",
+                forcePlaceholderSize: !0,
+                helper: "clone",
+                cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
+                revert: 250, // animation in milliseconds
+                update: function(b, c) {
+                    my_portlet_update($(this),b,c);
+                }
+            });
+            $('#modrow .mod-sortable-list-piece').sortable({
+		connectWith: '#modrow .mod-sortable-list-piece',
+                //items: ".portlet", 
+                opacity: 0.8,
+                coneHelperSize: true,
+                placeholder: 'portlet-sortable-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: "pointer",
+                helper: "clone",
+                tolerance: "pointer",
+                forcePlaceholderSize: !0,
+                helper: "clone",
+                cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
+                revert: 250, // animation in milliseconds
+                update: function(b, c) {
+                    my_portlet_update($(this),b,c);
+                }
+            });
+            function my_portlet_update(obj,e,u)
+            {
+                if (u.item.prev().hasClass("portlet-sortable-empty")) {
+                        u.item.prev().before(u.item);
+                    }
+                    var idsInOrder = obj.sortable("toArray");
+                    var neworder = idsInOrder.indexOf(u.item.attr('id')); 
+                    var portletmoved = u.item;
+                    if(neworder > -1)
+                    {
+                        //alert('portlet moved '+portletmoved.attr('id'));
+                        //alert('new parent id '+portletmoved.parent().attr('id'));
+                        //alert('portlet positions '+idsInOrder);
+                        //alert('new order '+neworder);
+                        
+                    }
+            }
+            //End Pan Pan 17/4/2015 
+        }
+    };
+}();

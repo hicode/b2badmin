@@ -1,0 +1,701 @@
+<?php
+$di = Phalcon\DI::getDefault();
+?>
+<?php echo $this->tag->getDoctype(); ?>
+<?php $this->partial($di->controller_params_array['template']['template_view_dir'] . "license") ?>
+<?php
+$assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path'];
+$layoutspath = $assetspath . 'layouts/';
+$globalpath = $assetspath . 'global/';
+$pluginspath = $globalpath . 'plugins/';
+$template_admin_name = $di->controller_params_array['template']['template_admin_name'];
+$templateadmincustompath = $di->controller_params_array['template']['template_admin_custom_path'];
+?>
+
+<!--[if IE 8]> <html lang="en" class="ie8 no-js" data-ng-app="MetronicApp"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js" data-ng-app="MetronicApp"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="<?php echo $di->controller_params_array['lng']; ?>" data-ng-app="MetronicApp">
+    <!--<![endif]-->
+    <!-- BEGIN HEAD -->
+    <head>
+        <base href="<?php echo $di->controller_params_array['html_base_path']; ?>">
+        <title data-ng-bind="'<?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('site_title'); ?> - ' + $state.current.data.pageTitle"></title>
+
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1" name="viewport"/>
+        <meta content="" name="description"/>
+        <meta content="" name="author"/>
+
+        <!-- BEGIN GLOBAL MANDATORY STYLES -->
+
+
+
+
+
+        <!--<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css"/>-->
+
+
+
+        <?php
+        $collectionname = 'cssGlobal' . $template_admin_name;
+        $objcsscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            1 => array(
+                'path' => 'custom/css/',
+                'filename' => 'customfirst.css'
+            ),
+            5 => array(
+                'remoteurl' => 'http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all'
+            ),
+            10 => array(
+                'path' => $pluginspath . 'font-awesome/css/',
+                'filename' => 'font-awesome.css'
+            ),
+            20 => array(
+                'path' => $pluginspath . 'simple-line-icons/',
+                'filename' => 'simple-line-icons.css'
+            ),
+            30 => array(
+                'path' => $pluginspath . 'bootstrap/css/',
+                'filename' => 'bootstrap.css'
+            ),
+            40 => array(
+                'path' => $pluginspath . 'uniform/css/',
+                'filename' => 'uniform.default.css'
+            ),
+            50 => array(
+                'path' => $pluginspath . 'bootstrap-switch/css/',
+                'filename' => 'bootstrap-switch.css'
+            ),
+            60 => array(
+                'path' => $pluginspath . 'bootstrap-toastr/',
+                'filename' => 'toastr.min.css'
+            )
+        );
+        $cssminify = MyTags::MyCollectionGenerateCustomMinify($arr, $collectionname, 'css', false);
+        echo $cssminify;
+        
+        
+        
+        $collectionname = 'cssGlobal2' . $template_admin_name;
+        $objcsscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            
+            10 => array(
+                'path' => $pluginspath . 'typeahead/',
+                'filename' => 'typeahead.css'
+            ),
+            20 => array(
+                'path' => $pluginspath . 'select2/css/',
+                'filename' => 'select2.min.css'
+            ),
+            30 => array(
+                'path' => $pluginspath . 'select2/css/',
+                'filename' => 'select2-bootstrap.min.css'
+            ),
+            40 => array(
+                'path' => $pluginspath . 'bootstrap-datepicker/css/',
+                'filename' => 'bootstrap-datepicker3.min.css'
+            ),
+            50 => array(
+                'path' => $pluginspath . 'datatables/',
+                'filename' => 'datatables.min.css'
+            ),
+            60 => array(
+                'path' => $pluginspath . 'datatables/plugins/bootstrap/',
+                'filename' => 'datatables.bootstrap.css'
+            )
+        );
+        $cssminify = MyTags::MyCollectionGenerateCustomMinify($arr, $collectionname, 'css', false);
+        echo $cssminify;
+        
+        
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+20+path+0','pluginspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+20+path+1','select2/css/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+20+filename','select2.min.css'),
+//        
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+30+path+0','pluginspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+30+path+1','select2/css/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+30+filename','select2-bootstrap.min.css'),
+//        
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+40+path+0','pluginspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+40+path+1','bootstrap-datepicker/css/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+40+filename','bootstrap-datepicker3.min.css'),
+//        
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+41+path+0','pluginspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+41+path+1','datatables/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+41+filename','datatables.min.css'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+42+path+0','pluginspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+42+path+1','datatables/plugins/bootstrap/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+curves0+angular+css+42+filename','datatables.bootstrap.css'),
+               
+        
+        
+        //echo MyTags::MyCollectionCssGenerate($arr, $collectionname);
+        //
+        ?>
+
+        <!-- END GLOBAL MANDATORY STYLES -->
+
+        <!-- BEGIN DYMANICLY LOADED CSS FILES(all plugin and page related styles must be loaded between GLOBAL and THEME css files ) -->
+        <link id="ng_load_plugins_before"/>
+        <!-- END DYMANICLY LOADED CSS FILES -->
+
+        <!-- BEGIN THEME STYLES -->
+        <!-- DOC: To use 'rounded corners' style just load 'components-rounded.css' stylesheet instead of 'components.css' in the below style tag -->
+
+
+        <?php
+        $collectionname = 'cssTheme' . $template_admin_name . $di->controller_params_array['template']['template_admin_theme'] . $di->controller_params_array['template']['template_admin_theme_color'];
+        $objcsscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            0 => array(
+                'path' => $globalpath . 'css/',
+                'filename' => 'components.css'
+            ),
+            10 => array(
+                'path' => $globalpath . 'css/',
+                'filename' => 'plugins.css'
+            ),
+            20 => array(
+                'path' => $layoutspath . 'layout/css/',
+                'filename' => 'layout.css'
+            ),
+            30 => array(
+                'path' => $layoutspath . 'layout/css/themes/',
+                'filename' => $di->controller_params_array['template']['template_admin_theme_color'] . '.css'
+            ),
+            35 => array(
+                'path' => $pluginspath . 'bootstrap-datepicker/css/',
+                'filename' => 'bootstrap-datepicker3.min.css'
+            ),
+            40 => array(
+                'path' => $pluginspath . 'bootstrap-datetimepicker/css/',
+                'filename' => 'bootstrap-datetimepicker.min.css'
+            ),
+            50 => array(
+                'path' => $layoutspath . 'layout/css/',
+                'filename' => 'custom.css'
+            ),
+        );
+        $cssminify = MyTags::MyCollectionGenerateCustomMinify($arr, $collectionname, 'css', false);
+        echo $cssminify;
+        //echo MyTags::MyCollectionCssGenerate($arr, $collectionname);
+        //
+        //die('sdfg');
+        ?>
+        <!-- END THEME STYLES -->
+
+        <link rel="shortcut icon" href="custom/images/favicon.ico"/>
+    </head>
+    <!-- END HEAD -->
+
+
+    <!-- BEGIN BODY -->
+    <!-- DOC: Apply "page-header-fixed-mobile" and "page-footer-fixed-mobile" class to body element to force fixed header or footer in mobile devices -->
+    <!-- DOC: Apply "page-sidebar-closed" class to the body and "page-sidebar-menu-closed" class to the sidebar menu element to hide the sidebar by default -->
+    <!-- DOC: Apply "page-sidebar-hide" class to the body to make the sidebar completely hidden on toggle -->
+    <!-- DOC: Apply "page-sidebar-closed-hide-logo" class to the body element to make the logo hidden on sidebar toggle -->
+    <!-- DOC: Apply "page-sidebar-hide" class to body element to completely hide the sidebar on sidebar toggle -->
+    <!-- DOC: Apply "page-sidebar-fixed" class to have fixed sidebar -->
+    <!-- DOC: Apply "page-footer-fixed" class to the body element to have fixed footer -->
+    <!-- DOC: Apply "page-sidebar-reversed" class to put the sidebar on the right side -->
+    <!-- DOC: Apply "page-full-width" class to the body element to have full width page without the sidebar menu -->
+    <?php
+    $menuclosed = '';
+    if ($di->controller_params_array['template']['template_menu_close_on_start'] == 1) {
+        $menuclosed = 'page-sidebar-closed';
+    }
+    ?>
+    <body ng-controller="AppController" class="page-header-fixed page-sidebar-closed-hide-logo page-quick-sidebar-over-content page-on-load <?php echo $menuclosed; ?>">
+
+
+        <!-- BEGIN PAGE SPINNER -->
+        <div ng-spinner-bar class="page-spinner-bar">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+        <!-- END PAGE SPINNER -->
+
+        <!-- BEGIN HEADER -->
+<!--        <div data-ng-include="'<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => 'outer-header')); ?>'" data-ng-controller="HeaderController" class="page-header navbar navbar-fixed-top my-edit-js-control">
+        </div>-->
+        <div data-ng-controller="HeaderController" class="page-header navbar navbar-fixed-top my-edit-js-control">
+            <?php $this->partial($di->controller_params_array['template']['template_view_dir'] . 'index/dynhelperpage/' . "outer-header") ?>
+        </div>
+
+
+        <!-- END HEADER -->
+
+        <div class="clearfix">
+        </div>
+
+        <!-- BEGIN CONTAINER -->
+        <div class="page-container">
+            <!-- BEGIN SIDEBAR -->
+            <div data-ng-include="'<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => 'outer-sidebar')); ?>'" data-ng-controller="SidebarController" class="page-sidebar-wrapper">			
+            </div>
+<!--            <div data-ng-controller="SidebarController" class="page-sidebar-wrapper">
+                <?php //$this->partial($di->controller_params_array['template']['template_view_dir'] . 'index/dynhelperpage/' . "outer-sidebar") ?>
+            </div>-->
+            <!-- END SIDEBAR -->
+
+            <!-- BEGIN CONTENT -->
+            <div class="page-content-wrapper">
+
+                <div class="page-content">
+                    <div id="bootstrap_alert_general"> </div>
+                    <!-- BEGIN STYLE CUSTOMIZER(optional) -->
+                    <!-- Pan Pan start fix hide search and theme bar on modal with class my-edit-js-control 06/05/2015 -->
+                    <!--<div data-ng-include="'<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => 'outer-theme-panel')); ?>'" data-ng-controller="ThemePanelController" class="theme-panel hidden-xs hidden-sm my-edit-js-control">				
+                         Pan Pan end fix hide search and theme bar on modal with class my-edit-js-control 06/05/2015 
+                    </div>-->
+                    <!-- END STYLE CUSTOMIZER -->
+
+                    <!-- BEGIN ACTUAL CONTENT -->
+                    <div ui-view class="fade-in-up" id="actualcontent">
+                    </div> 
+                    <!-- END ACTUAL CONTENT -->
+                </div>	
+            </div>
+            <!-- END CONTENT -->
+
+            <!-- BEGIN QUICK SIDEBAR -->
+            <a href="javascript:;" class="page-quick-sidebar-toggler"><i class="icon-close"></i></a>
+<!--            <div data-ng-include="'<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => 'outer-quick-sidebar')); ?>'" data-ng-controller="QuickSidebarController" class="page-quick-sidebar-wrapper"></div>
+            -->
+            <div data-ng-controller="QuickSidebarController" class="page-quick-sidebar-wrapper">
+                <?php $this->partial($di->controller_params_array['template']['template_view_dir'] . 'index/dynhelperpage/' . "outer-quick-sidebar") ?>
+            </div>
+
+
+            <!-- END QUICK SIDEBAR -->
+        </div>
+        <!-- END CONTAINER -->
+        <!-- BEGIN FOOTER -->
+<!--        <div data-ng-include="'<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => 'outer-footer')); ?>'" data-ng-controller="FooterController" class="page-footer">
+        </div>-->
+
+        <div data-ng-controller="FooterController" class="page-footer">
+            <?php $this->partial($di->controller_params_array['template']['template_view_dir'] . 'index/dynhelperpage/' . "outer-footer") ?>
+        </div>
+
+        <!-- END FOOTER -->
+
+        <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+
+        <!-- BEGIN CORE JQUERY PLUGINS -->
+        <!--[if lt IE 9]>
+        <script src="../../../assets/global/plugins/respond.min.js"></script>
+        <script src="../../../assets/global/plugins/excanvas.min.js"></script> 
+        <![endif]
+        <script src="<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE, array('helperpage' => 'js-custom-first')); // '/b2b/' . $di->controller_params_array['lng'] . '/admin/dynhelperpage/js-custom-first/1.js';                    ?>"></script>-->
+        <?php
+        $collectionname = 'jsJqueryCorePlugins' . $template_admin_name;
+        $objjscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            0 => array('partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/", 'partialviewname' => 'js-custom-first'),
+            //0 => array(
+            //    'localurl' => '/b2b/' . $di->controller_params_array['lng'] . '/admin/dynhelperpage/js-custom-first/1.js',
+            //),
+            2 => array(
+                'path' => $pluginspath . '',
+                'filename' => 'jquery.min.js'
+            ),
+            10 => array(
+                'path' => 'custom/js/',
+                'filename' => 'customfirst.js'
+            ),
+            20 => array(
+                'path' => $pluginspath . '',
+                'filename' => 'jquery-migrate.min.js'
+            ),
+            30 => array(
+                'path' => $pluginspath . 'jquery-ui/',
+                'filename' => 'jquery-ui.min.js'
+            ),
+            40 => array(
+                'path' => $pluginspath . 'bootstrap/js/',
+                'filename' => 'bootstrap.min.js'
+            ),
+            // DLS20161107
+            41 => array(
+                'path' => $pluginspath,
+                'filename' => 'moment.min.js'
+            ),
+            // DLE20161107
+            45 => array(
+                'path' => $pluginspath . 'jquery-validation/js/',
+                'filename' => 'jquery.validate.min.js'
+            ),
+            46 => array(
+                'path' => $pluginspath . 'jquery-validation/js/',
+                'filename' => 'additional-methods.min.js'
+            ),
+            47 => array(
+                'path' => $pluginspath . 'jquery-inputmask/',
+                'filename' => 'jquery.inputmask.bundle.min.js'
+            ),
+            48 => array(
+                'path' => $pluginspath . 'bootstrap-confirmation/',
+                'filename' => 'bootstrap-confirmation.min.js'
+            ),            
+            50 => array(
+                'path' => $pluginspath . 'bootstrap-hover-dropdown/',
+                'filename' => 'bootstrap-hover-dropdown.min.js'
+            ),
+            60 => array(
+                'path' => $pluginspath . 'jquery-slimscroll/',
+                'filename' => 'jquery.slimscroll.min.js'
+            ),
+            70 => array(
+                'path' => $pluginspath . '',
+                'filename' => 'jquery.blockui.min.js'
+            ),
+            80 => array(
+                'path' => $pluginspath . '',
+                'filename' => 'jquery.cokie.min.js'
+            ),
+            90 => array(
+                'path' => $pluginspath . 'uniform/',
+                'filename' => 'jquery.uniform.min.js'
+            ),
+            95 => array(
+                'path' => $pluginspath . 'bootstrap-switch/js/',
+                'filename' => 'bootstrap-switch.min.js'
+            ),
+            97 => array(
+                'path' => $pluginspath . 'bootstrap-toastr/',
+                'filename' => 'toastr.min.js'
+            ),
+            99 => array(
+                'path' => $pluginspath . 'bootstrap-confirmation/',
+                'filename' => 'bootstrap-confirmation.min.js'
+            ),
+            110 => array(
+                'path' => $pluginspath . 'datatables/',
+                'filename' => 'datatables.all.min.js'
+            ),
+            
+            
+            // DLS20161107
+            112 => array(
+                'partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/",
+                'partialviewname' => 'js-dl-pdf'),            
+            // DLE20161107
+            
+            
+            
+            113 => array(
+                'partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/",
+                'partialviewname' => 'js-dl-helpercontainer'),
+            114 => array(
+                'partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/",
+                'partialviewname' => 'js-dl-generalajax'),
+            
+            115 => array(
+                'partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/",
+                'partialviewname' => 'js-dl-newrecord'),
+            120 => array(
+                'partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/",
+                'partialviewname' => 'js-datatable'),            
+            125 => array(
+                'partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/",
+                'partialviewname' => 'js-dl-deleterecord'),
+            130 => array(
+                'partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/",
+                'partialviewname' => 'js-table-ajax'),
+            135 => array(
+                'path' => $pluginspath . 'counterup/',
+                'filename' => 'jquery.waypoints.min.js'),            
+            
+            140 => array(
+                'path' => $pluginspath . '',
+                'filename' => 'moment-with-locales.js'),
+            150 => array(
+                'path' => $templateadmincustompath . 'plugins/fullcalendarv261/',
+                'filename' => 'fullcalendar.min.js'),
+            160 => array(
+                'path' => $templateadmincustompath . 'plugins/fullcalendarv261/',
+                'filename' => 'lang-all.js'),
+            170 => array(
+                'path' => $pluginspath . 'bootstrap-wysihtml5/',
+                'filename' => 'wysihtml5-0.3.0.js'),
+            180 => array(
+                'path' => $pluginspath . 'bootstrap-wysihtml5/',
+                'filename' => 'bootstrap-wysihtml5.js'),
+            190 => array(
+                'path' => $pluginspath . 'ckeditor/',
+                'filename' => 'ckeditor.js'),
+            200 => array(
+                'path' => $pluginspath . 'amcharts/amcharts/',
+                'filename' => 'amcharts.js'),
+            210 => array(
+                'path' => $pluginspath . 'amcharts/amcharts/',
+                'filename' => 'serial.js'),
+            220 => array(
+                'path' => $pluginspath . 'amcharts/amcharts/',
+                'filename' => 'pie.js'),
+            230 => array(
+                'path' => $pluginspath . 'amcharts/amcharts/',
+                'filename' => 'radar.js'),
+            240 => array(
+                'path' => $pluginspath . 'amcharts/amcharts/',
+                'filename' => 'light.js'),
+            250 => array(
+                'path' => $pluginspath . 'amcharts/amcharts/',
+                'filename' => 'patterns.js'),
+            260 => array(
+                'path' => $pluginspath . 'amcharts/amcharts/',
+                'filename' => 'chalk.js'),
+            270 => array(
+                'path' => $pluginspath . 'flot/',
+                'filename' => 'jquery.flot.min.js'),
+            280 => array(
+                'path' => $pluginspath . 'flot/',
+                'filename' => 'jquery.flot.resize.min.js'),
+            290 => array(
+                'path' => $pluginspath . 'flot/',
+                'filename' => 'jquery.flot.categories.min.js'),
+            300 => array(
+                'path' => $pluginspath . 'jquery-easypiechart/',
+                'filename' => 'jquery.easypiechart.min.js'),
+            310 => array(
+                'path' => $pluginspath . '',
+                'filename' => 'jquery.sparkline.min.js'),
+            320 => array(
+                'path' => $pluginspath . 'counterup/',
+                'filename' => 'jquery.counterup.min.js'),
+            330 => array(
+                'path' => $pluginspath . 'typeahead/',
+                'filename' => 'handlebars.min.js'),
+            340 => array(
+                'path' => $pluginspath . 'typeahead/',
+                'filename' => 'typeahead.bundle.min.js'),
+        );
+
+
+
+
+
+
+
+
+
+//        ('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+10+path+0','assetspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+10+path+1','global/plugins/amcharts/amcharts/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+10+filename','amcharts.js'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+20+path+0','assetspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+20+path+1','global/plugins/amcharts/amcharts/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+20+filename','serial.js'),
+//
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+30+path+0','assetspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+30+path+1','global/plugins/amcharts/amcharts/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+30+filename','pie.js'),
+//
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+40+path+0','assetspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+40+path+1','global/plugins/amcharts/amcharts/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+40+filename','radar.js'),
+//
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+50+path+0','assetspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+50+path+1','global/plugins/amcharts/amcharts/themes/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+50+filename','light.js'),
+//
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+60+path+0','assetspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+60+path+1','global/plugins/amcharts/amcharts/themes/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+60+filename','patterns.js'),
+//
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+70+path+0','assetspath'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+70+path+1','global/plugins/amcharts/amcharts/themes/'),
+//('curves',(select id from core_plugin where pluginname='outersidebarmenuv100_outer_sidebar_menu'),'item+0+angular+js+70+filename','chalk.js'),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        $jsminify = MyTags::MyCollectionGenerateCustomMinify($arr, $collectionname, 'js', false);
+        echo $jsminify;
+        //echo MyTags::MyCollectionJsGenerate($arr, $collectionname);
+        //$tst=$this->assets->outputInlineJs($collectionname);
+        //
+        //$tst=$this->assets->outputInlineJs($collectionname);
+        ?>
+
+
+        <!-- END CORE JQUERY PLUGINS -->
+
+        <!-- BEGIN CORE ANGULARJS PLUGINS -->
+
+        <?php
+        $collectionname = 'jsAngularCorePlugins' . $template_admin_name;
+        $objjscollection = $this->assets->collection($collectionname);
+        $arr = array(
+            0 => array(
+                'path' => $pluginspath . 'angularjs/',
+                'filename' => 'angular.min.js'
+            ),
+            1 => array(
+                'path' => $pluginspath . 'angularjs/',
+                'filename' => 'angular-sanitize.min.js'
+            ),
+            2 => array(
+                'path' => $pluginspath . 'angularjs/',
+                'filename' => 'angular-touch.min.js'
+            ),
+            3 => array(
+                'path' => $pluginspath . 'angularjs/plugins/',
+                'filename' => 'angular-ui-router.min.js'
+            ),
+            4 => array(
+                'path' => $pluginspath . 'angularjs/plugins/',
+                'filename' => 'ocLazyLoad.min.js'
+            ),
+            5 => array(
+                'path' => $pluginspath . 'angularjs/plugins/',
+                'filename' => 'ui-bootstrap-tpls.min.js'
+            )
+        );
+        $jsminify = MyTags::MyCollectionGenerateCustomMinify($arr, $collectionname, 'js', false);
+        echo $jsminify;
+        //echo MyTags::MyCollectionJsGenerate($arr, $collectionname);
+        //
+        ?>
+
+        <!-- END CORE ANGULARJS PLUGINS -->
+
+        <!-- BEGIN APP LEVEL ANGULARJS SCRIPTS 
+        <script src="/b2b/<?php echo $di->controller_params_array['lng']; ?>/admin/dynhelperpage/js-app/1.js"></script> -->
+        <?php
+        $collectionname = 'jsAngularApp' . $template_admin_name;
+        $objjscollection = $this->assets->collection($collectionname);
+        $arr = array(
+            //0 => array(
+            //    'path' => 'custom/'.$di->controller_params_array['template']['template_admin_path'] .'theme/templates/admin/angularjs/js/',
+            //    'filename' => 'app.js'
+            //),
+            //0 => array(
+            //    'path' => 'http://phalconphp.com.local/b2b/admin/dynhelperpage/',
+            //    'filename' => 'js-app/'
+            //),
+            0 => array('partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/", 'partialviewname' => 'js-main'),
+            //0 => array(
+            //    'localurl' => '/b2b/' . $di->controller_params_array['lng'] . '/admin/dynhelperpage/js-app/1.js',
+            //),
+            10 => array(
+                'path' => $di->controller_params_array['template']['template_admin_path'] . '/' . $di->controller_params_array['template']['template_admin_path_base'] . 'js/',
+                'filename' => 'directives.js'
+            ),
+            20 => array(
+                'path' => $pluginspath . '',
+                'filename' => 'jquery.pulsate.min.js'
+            ),
+            30 => array(
+                'path' => $pluginspath . 'jquery-bootpag/',
+                'filename' => 'jquery.bootpag.min.js'
+            ),
+            35 => array(
+                'path' => $pluginspath . 'bootstrap-datepicker/js/',
+                'filename' => 'bootstrap-datepicker.min.js'
+            ),
+            37 => array(
+                'path' => $pluginspath . 'bootstrap-datepicker/locales/',
+                'filename' => 'bootstrap-datepicker.' . MyCustomHelperLng::My_get_current_lng_shortname() . '.min.js'
+            ),
+            40 => array(
+                'path' => $pluginspath . 'bootstrap-datetimepicker/js/',
+                'filename' => 'bootstrap-datetimepicker.min.js'
+            )
+        );
+        $jsminify = MyTags::MyCollectionGenerateCustomMinify($arr, $collectionname, 'js', false);
+        echo $jsminify;
+        //echo MyTags::MyCollectionJsGenerate($arr, $collectionname);
+        //
+        ?>
+
+        <!-- END APP LEVEL ANGULARJS SCRIPTS -->
+
+        <!-- BEGIN APP LEVEL JQUERY SCRIPTS -->
+
+
+        <?php
+        $collectionname = 'jsJqueryApp' . $template_admin_name;
+        $objjscollection = $this->assets->collection($collectionname);
+        $arr = array(
+            0 => array('partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/", 'partialviewname' => 'js-app'),
+            3 => array('partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/", 'partialviewname' => 'js-ui-general'),
+            5 => array(
+                'path' => $layoutspath . 'layout/scripts/',
+                'filename' => 'layout.js'
+            ),
+            10 => array(
+                'path' => $layoutspath . 'layout/scripts/',
+                'filename' => 'demo.js'
+            ),
+            30 => array(
+                'path' => $layoutspath . 'global/scripts/',
+                'filename' => 'quick-sidebar.js'
+            ),
+            50 => array('partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/", 'partialviewname' => 'js-components-pickers'),
+            60 => array(
+                'path' => 'custom/js/',
+                'filename' => 'customend.js'
+            ),
+            90 => array('partialviewdir' => $di->controller_params_array['template']['template_view_dir'] . "index/dynhelperpage/", 'partialviewname' => 'js-custom-end'),
+                //90 => array(
+                //    'localurl' => '/b2b/' . $di->controller_params_array['lng'] . '/admin/dynhelperpage/js-custom-end/1.js',
+                //),
+        );
+        $jsminify = MyTags::MyCollectionGenerateCustomMinify($arr, $collectionname, 'js', false);
+        echo $jsminify;
+        //echo MyTags::MyCollectionJsGenerate($arr, $collectionname);
+        //
+        ?>
+
+        <!--<script src="<?php echo '/b2b/' . $di->controller_params_array['lng'] . '/admin/dynhelperpage/js-custom-end/1.js'; ?>"></script>-->
+
+        <!-- END APP LEVEL JQUERY SCRIPTS -->
+
+        <script type="text/javascript">
+                            /* Init Metronic's core jquery plugins and layout scripts */
+                            //$(document).ready(function () {
+                            //    Metronic.init(); // Run metronic theme
+                            //App.init();
+                            //    Metronic.setAssetsPath(<?php echo '\'' . $assetspath . '\''; ?>); // Set the assets folder path			
+                            //});
+        </script>
+        <!-- END JAVASCRIPTS -->
+
+        <?php echo $this->getContent() ?>
+        <?php
+//$r = AutoGenCustomHelperB2bAio::$Core_Tbl_Settings;
+//$t=8;
+//echo $r;
+        ?>
+    </body>
+    <!-- END BODY -->
+</html>
+
+

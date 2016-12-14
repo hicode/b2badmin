@@ -1,0 +1,280 @@
+<?php echo $this->tag->getDoctype(); ?>
+<?php
+/*
+  use MyCommon\Session\Pub\Lng;
+  echo $this->doctype();
+ * */
+$di = $this->getDI();
+$classviewmodtranslate =\MyCustomHelperClassTools::My_Core_Get_Classname('Viewmodtranslate');
+?>
+
+<html lang="<?php echo $di->controller_params_array['lng']; ?>">
+    <head>
+        <base href="<?php echo $this->getDI()->controller_params_array['html_base_path']; ?>" target="_self">
+        <link href="<?php echo $di->controller_params_array['site_publicpath']; ?>components/com_mobile/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <title><?php echo $classviewmodtranslate::getKeyvalueFromKeyname('Ministry-of-National-Defence1'); ?></title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="description" content="<?php echo $classviewmodtranslate::getKeyvalueFromKeyname('Ministry-of-National-Defence-Official-Web-Page1'); ?>">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="robots" content="index, follow">
+        <meta name="keywords" content="<?php echo $classviewmodtranslate::getKeyvalueFromKeyname('Base-Keywords1'); ?>">
+        <?php
+        $collectionname = $di->controller_params_array['lng'] . 'js-mobile' . md5($this->view->getLayout());
+        $objjscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            5 => array('partialviewdir' => $di->controller_params_array['layout_mobile_view_folder'] . "dynpage/", 'partialviewname' => 'js-mobile'),
+        );
+
+        echo MyTags::MyCollectionJsGenerate($arr, $collectionname);
+        if (MyCustomHelperCoreDi::Get_CacheCssJsEnabled()) {
+            
+        }
+        ?>
+        
+        <?php
+        $collectionname = $di->controller_params_array['lng'] . 'css-mobile' . md5($this->view->getLayout());
+        $objcsscollection = $this->assets->collection($collectionname);
+
+        $arr = array(
+            0 => array('partialviewdir' => $di->controller_params_array['layout_mobile_view_folder'] . "dynpage/", 'partialviewname' => 'css-mobile')
+        );
+
+        echo MyTags::MyCollectionCssGenerate($arr, $collectionname);
+        if (MyCustomHelperCoreDi::Get_CacheCssJsEnabled()) {
+            
+        }
+        ?>
+
+
+
+
+
+
+
+        <!--ie hack. set the max width of the logo image in px, otherwise you canot change its size  -->
+        <!--[if IE 7]>
+               <style>
+                       .fw-head.fw-logo img
+                       {
+                               max-width: 290px;
+                       }
+                       
+                       .dm_header .logo-div img
+                       {
+                               max-width: 290px;
+                       }
+               </style>
+       <![endif]-->
+        <!--[if IE 8]>
+                <style>
+                        .fw-head .fw-logo img
+                        {
+                                max-width: 290px;
+                        }
+   
+     
+                        .dm_header .logo-div img
+                        {
+                                max-width: 290px;
+                        }
+                        *#dm div.dmHeader
+                        {
+                                _height:90px;
+                                min-height:0px;
+                        }
+                        
+                </style>
+<![endif]-->
+
+        <!-- back button -->
+        <script>
+            var previewPopUp = true;
+
+            $(document).ready(function () {
+
+                if (!$.DM.getQueryParam(window.location.href, "nee")) {
+                    var baseUrl = Parameters.HomeUrl.trim().replace('?preview=true', '');
+                    var parentWindow = window.parent;
+
+                    var OPEN_TABLE_LINE = '_dm/s/rt/widgets/opentable/opentable.html';
+
+
+                    if (parentWindow.$ && parentWindow.$.previewExternalLink) {
+                        parentWindow.$.previewExternalLink.setLastEditePage(window.location.href);
+
+                        $('body').on('click', 'a', function (e) {
+                            var $this = $(this);
+                            var $thisHref = $this.attr('href') || '';
+
+                            if ("_blank" == $this.attr('target')) {
+                                return;
+                            }
+
+                            if (('dmBackBtn' !== $this.attr('id') && $thisHref && $thisHref != '' && -1 == $thisHref.indexOf('/site/' + Parameters.SiteAlias) && 'true' != $this.attr('dm_dont_rewrite_url')) || 0 == $thisHref.indexOf('http://m.modmilmobile.com/') || 'classic_link' == $(this).attr('id') || -1 < $thisHref.indexOf(OPEN_TABLE_LINE)) {
+                                if (-1 == $thisHref.indexOf(baseUrl) || 0 == $thisHref.indexOf('http://m.modmilmobile.com/') || 'classic_link' == $(this).attr('id') || -1 < $thisHref.indexOf(OPEN_TABLE_LINE)) {
+                                    parentWindow.$.previewExternalLink.setBackFromExternal(true);
+                                } else {
+                                    parentWindow.$.previewExternalLink.setLastEditePage($thisHref);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+        </script>
+        <!-- END OF back button -->
+
+
+        <script type="text/javascript">
+            Parameters.AjaxContainer = "div.dmBody";
+            Parameters.WrappingContainer = "div.dmOuter";
+            Parameters.HomeUrl = "<?php echo MyCustomHelperPages::makePage(CHMod20130918MConstantsPages::CONST_MOBILE_PAGES_INDEX, array('lng' => $di->controller_params_array['lng'])); ?>";
+            Parameters.SiteAlias = "modelmobile";
+            Parameters.SiteId = "330795";
+            Parameters.InitialPageAlias = "Hellenic Ministry of National Defence";
+            Parameters.IsFromScratch = "false";
+            Parameters.CurrentPageUrl = "null.html";
+            Parameters.IsCurrentHomePage = false;
+
+            Parameters.AllowAjax = false;
+            Parameters.AfterAjaxCommand = null;
+            Parameters.NavigationAreaParams.ShowBackToHomeOnInnerPages = true;
+
+            Parameters.NavigationAreaParams.NavbarSize = 8;
+            Parameters.NavigationAreaParams.NavbarLiveHomePage = "<?php echo MyCustomHelperPages::makePage(CHMod20130918MConstantsPages::CONST_MOBILE_PAGES_INDEX, array('lng' => $di->controller_params_array['lng'])); ?>";
+            Parameters.NavigationAreaParams.BlockContainerSelector = ".dmBody";
+            Parameters.NavigationAreaParams.NavbarSelector = "#dmNav:has(a)";
+            Parameters.NavigationAreaParams.SubNavbarSelector = "#subnav_main";
+            Parameters.HomeLinkText = "Back To Home";
+            Parameters.UseGalleryModule = false;
+            Parameters.CurrentThemeName = "Layout Theme";
+            Parameters.DefaultPageAlias = "default";
+            Parameters.LayoutVariationID = 3;
+            Parameters.LayoutID = 4;
+            Parameters.WidgetStyleID = null;
+            Parameters.IsHeaderFixed = false;
+            Parameters.IsHeaderSkinny = false;
+            Parameters.IsBfs = true;
+            Parameters.LayoutParams = {
+                _manifestId: 1208
+            };
+
+
+            Parameters.NavigationAreaParams.MoreButtonText = "More";
+
+            Parameters.NavigationAreaParams.LessButtonText = "Less";
+
+            Parameters.HomeLinkText = "Home";
+
+
+            //Parameters.Charset = 'null';
+
+        </script>
+
+        <script type="text/javascript">
+            $(window).resize(function () {
+                jQuery.DM.updateWidth();
+
+
+
+
+            });
+            $(window).bind("orientationchange", function (e) {
+                jQuery.DM.updateWidth();
+                jQuery.layoutManager.initLayout();
+
+            });
+            $(document).resize(function () {
+                jQuery.DM.updateWidth();
+                // 		jQuery.layoutManager.initLayout();
+
+
+
+            });
+        </script>
+
+    </head>
+
+
+    <body id="dmRoot" class=" " style="overflow:auto;padding:0;margin:0;float:none;"  >
+
+
+        <script>
+            jQuery.DM.updateWidth();
+            jQuery.DM.updateIOSHeight();
+        </script>
+
+
+
+
+        <div id="disabledImageZone" style="display:none;z-index:-1">
+
+            <img id="imageZone" src="<?php echo $di->controller_params_array['base_path_with_site_publicpath']; ?>components/com_mobile/images/ajax-loader.gif" style="position:absolute;display:none"/>
+
+        </div>
+
+        <!-- wrap the content with a div to ensure that css created by us will override page/site css    -->
+        <div id="dm" class='dmwr'>
+
+
+            <div class="dm_wrapper matrix-var3 widgetStyle-2 matrix"> 
+                <body dmwrapped="true" id="1251294294" class="dm-home-page">
+                    <div dm:templateorder="4" dmtemplateid="MatrixLayout" class="dm-bfs dm-layout-home"><!-- 	<dm:Variable dm:id="wrapperVariable" dm:target="layout" dm:attribute="class"/> --> <div id="dmStyle_outerContainer" class="dmOuter"> <div id="dmStyle_innerContainer" class="dmInner"> <div class="dmLayoutWrapper matrix-var"> <a href="#dm_navGrouplink-anakinosisa" class="dmBackToTop" id="dmBackToTop"></a> 
+                                    <div id="iscrollBody"> <div id="site_content" class="hasDmMatrixNav"> 
+                                            <!--<div id="ad"> <div> <script>jQuery(document).ready(function() {_gaq.push(['_trackEvent','DudaBanner', 'dm_banner_3.html','impression']);})</script> 
+                                                    <a href="../../m.modmilmobile.com/m/indexbea4.html?source=dm_banner_3.png" onclick="_gaq.push(['_trackEvent','DudaBanner', 'dm_banner_3.html','click']);"><img width="100%" src="../_dm/s/rt/images/banners/dm_banner_3.png"/></a> 
+                                                </div> 
+                                            </div> -->
+
+
+                                            <?php echo CHMod20130918MHeaderContent::getHeaderContent(); ?>
+
+
+
+                                            <div dmwrapped="true" id="1251294294" class="dmBody u_dmStyle_template_home dm-home-page"> 
+                                                <div id="allWrapper" class="allWrapper"><!-- navigation placeholders --> 
+                                                    <div id="navWrapper" class="navWrapper"> <div id="hiddenNavPlaceHolder" class="hiddenNavPlaceHolder navPlaceHolder dmDisplay_None" navplaceholder="true"></div> 
+                                                        <div id="backToHomePlaceHolder" class="backToHomePlaceHolder navPlaceHolder" navplaceholder="true"></div> 
+                                                        <span style="clear:both;display:block" id="1787044681"></span> 
+                                                        <div id="newNavigationSubNavPlaceHolder" class="newNavigationSubNavPlaceHolder navPlaceHolder dmEmptyNav" navplaceholder="true"> <ul class="default dmNav dmn dmNavCustom" id="dm_navGroup00s" shape_class="default" view_type="sub"></ul> 
+                                                            <div class="noFloat"></div> 
+                                                        </div> 
+                                                        <span style="clear:both;display:block" id="1528412969"></span> 
+                                                    </div> 
+                                                    <?php
+                                                    echo $this->getContent();
+                                                    ?>
+                                                    <span style="clear:both;display:block" id="1221542405"></span> 
+                                                </div> 
+
+
+
+
+                                                <?php echo CHMod20130918MFooterContent::getFooterContent(); ?>   
+                                            </div>
+                                        </div>
+
+                                    </div> 
+                                </div> 
+                            </div> 
+                        </div> 
+
+                    </div>
+                </body>
+            </div>
+        </div>
+
+        <!-- note these also must be called after ajax -->
+
+
+
+        <div id="fb-root"></div>
+
+
+    </body>
+
+
+</html>

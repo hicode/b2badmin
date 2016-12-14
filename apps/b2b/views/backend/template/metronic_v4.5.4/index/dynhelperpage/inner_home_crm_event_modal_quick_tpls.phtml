@@ -1,0 +1,14 @@
+<?php
+
+$di = Phalcon\DI::getDefault();
+
+// Get core data
+$modal = \B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::Get_Modal(false, true, false);
+
+// Get contents
+$bodycontents = \B2b\Models\CoreModels\DlB2bAdminCreateEventQuickTplsHelper::Get_Quick_Tpl_Content($di->controller_params_array['param1'], $di->controller_params_array['param2']);
+
+// Replace header, and contetns with placeholders
+$modal = str_replace(\B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::$BodyContentPlaceholder, $bodycontents, $modal);
+
+echo $modal;

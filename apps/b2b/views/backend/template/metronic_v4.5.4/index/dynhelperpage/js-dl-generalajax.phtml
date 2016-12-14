@@ -1,0 +1,36 @@
+//<script>
+    var DlGeneralAjax = {
+        ajaxDefs: {
+            async: true,
+            dataType: 'json',
+            type: 'GET',
+            timeout: null
+        },
+        getAjaxData: function (url, data, cb, options) {
+            if (url === '' || typeof url === 'undefined' || url === null) {
+                toastrMsg('', '<span class="text-center"><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('errortitle') ?></span><br><span><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('codetitle') ?>: 1000</span>', 'error');
+                return false;
+            }
+            var ajaxparams = !$.isEmptyObject(options) ? $.extend({}, this.ajaxDefs, options) : this.ajaxDefs;
+            $.ajax({
+                url: url,
+                data: data,
+                async: ajaxparams.async,
+                dataType: ajaxparams.dataType,
+                type: ajaxparams.type,
+                timeout: ajaxparams.timeout,
+                success: function (ret) {
+                    if (typeof cb === 'function') {
+                        cb(ret);
+                    } else {
+                        return false;
+                    }
+                },
+                error: function (a, b, c) {
+                    toastrMsg('', '<span class="text-center"><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('errortitle') ?></span><br><span><?php echo B2b\Models\CoreModels\PpB2bAdminVftranslate::getKeyvalueFromKeyname('codetitle') ?>: 1005</span>', 'error');
+                    return false;
+                }
+            });
+        }
+    };
+//</script>

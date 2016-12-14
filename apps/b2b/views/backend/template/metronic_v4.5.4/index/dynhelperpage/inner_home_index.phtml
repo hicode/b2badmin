@@ -1,0 +1,35 @@
+<?php
+$di = \Phalcon\DI::getDefault();
+$assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path'];
+?>
+<!-- BEGIN PAGE HEADER-->
+
+<?php
+echo Metronic454CCustomHelperAjax::get_div_ajax_small_stack1();
+echo Metronic454CCustomHelperAjax::get_div_ajax_full();
+?>
+<?php
+echo \B2b\Models\CoreModels\PpB2bAdminMetronic454PluginPageHelperHeader::Get_Page_Header(false);
+?>
+<!-- END PAGE HEADER-->
+<!-- BEGIN MAIN CONTENT -->
+<div ng1-controller="DashboardController">
+        
+        <!-- BEGIN DASHBOARD NOTIFIER -->
+	<?php echo B2b\Models\CoreModels\PpB2bAdminGeneralHelper::Get_Dashboard_Notifier(true,false); ?>
+        
+	<!-- BEGIN DASHBOARD STATS -->
+	<?php echo B2b\Models\CoreModels\PpB2bAdminGeneralHelper::Get_Dashboard_Counters(true,true); ?>
+        <?php echo B2b\Models\CoreModels\PpB2bAdminGeneralHelper::Get_Dashboard_Buttons(); ?>
+	                
+        <!-- BEGIN DASHBOARD RESULTS CONTAINER -->
+        <?php echo B2b\Models\CoreModels\PpB2bAdminGeneralHelper::Get_Dashboard_Results_Container(); ?>
+        
+</div>
+<script> 
+App.handleCounterup();
+</script>
+<!-- END MAIN CONTENT -->
+<!-- BEGIN MAIN JS & CSS -->
+
+<!-- BEGIN MAIN JS & CSS -->

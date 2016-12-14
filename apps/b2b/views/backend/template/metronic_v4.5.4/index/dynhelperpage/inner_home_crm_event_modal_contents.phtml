@@ -1,0 +1,22 @@
+<?php $di = \Phalcon\DI::getDefault(); ?>
+<?php
+// DLS20161111
+if (\B2b\Models\CoreModels\DlB2bAdminFullCalendar::Get_Create_Event_Add_Mode() === 'portlet') {    
+    $tpl = \B2b\Models\CoreModels\DlB2bAdminCreateEventModalHelper::Get_Create_Event_Modal_Body_Content();
+    $preset = 0;
+    $presetvals = [];   
+    echo json_encode([
+        'tpl' => $tpl,
+        'preset' => 0,
+        'presetvals' => []
+    ]);
+} else {
+    //TODO , Na to kanw modify me vasi to portlet, preset values
+//    $modal = \B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::Get_Modal(true, true, false);
+//    $headercontents = \B2b\Models\CoreModels\DlB2bAdminCreateEventModalHelper::Get_Create_Event_Modal_Header_Content();
+//    $bodycontents = \B2b\Models\CoreModels\DlB2bAdminCreateEventModalHelper::Get_Create_Event_Modal_Body_Content();
+//    $modal = str_replace(\B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::$HeaderContentPlaceholder, $headercontents, $modal);
+//    $modal = str_replace(\B2b\Models\CoreModels\DlB2bAdminMetronic454PluginModalGeneral::$BodyContentPlaceholder, $bodycontents, $modal);
+//    echo json_encode($modal);
+}
+?>

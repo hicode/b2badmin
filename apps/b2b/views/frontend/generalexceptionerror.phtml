@@ -1,0 +1,6 @@
+<?php
+
+$di = Phalcon\DI::getDefault();
+$jsonarr = array('success' => 0, 'msg' => $di->controller_params_array['exception']['message'], 'data' => '');
+echo json_encode($jsonarr);
+?>

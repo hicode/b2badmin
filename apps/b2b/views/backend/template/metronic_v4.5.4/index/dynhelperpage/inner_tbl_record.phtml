@@ -1,0 +1,27 @@
+<?php $assetspath = $di->controller_params_array['template']['template_admin_path_assets']; ?>
+<!-- BEGIN PAGE HEADER-->
+<?php
+echo Metronic362CCustomHelperAjax::get_div_ajax_small_stack1();
+echo Metronic362CCustomHelperAjax::get_div_ajax_full();
+?>
+<?php
+$di->controller_params_array[CHCrmCParams::$keyarrPageHelperHeader]['blshowactions']=false;
+echo Metronic362CCustomHelperInnerPageHelperHeader::Get_Page_Header();
+?>
+
+<!-- END PAGE HEADER-->
+<!-- BEGIN MAIN CONTENT -->
+<div id="innervars">
+<?php
+echo $di->controller_params_array['asyncdata'];
+?>
+</div>
+<!-- END MAIN CONTENT -->
+
+<!-- BEGIN PAGE LEVEL PLUGINS 
+<script src="/<?php echo $assetspath; ?>global/plugins/bootstrap-confirmation/bootstrap-confirmation.min.js" type="text/javascript"></script>-->
+<!-- END MAIN JS -->
+<script type="text/javascript">
+    runeveryinner();
+</script>
+

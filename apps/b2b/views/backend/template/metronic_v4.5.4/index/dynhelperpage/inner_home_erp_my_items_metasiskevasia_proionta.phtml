@@ -1,0 +1,142 @@
+<?php
+$di = \Phalcon\DI::getDefault();
+$assetspath = $di->controller_params_array['template']['template_admin_path_with_assets_path'];
+?>
+<!-- BEGIN PAGE HEADER-->
+
+<?php
+echo Metronic454CCustomHelperAjax::get_div_ajax_small_stack1();
+echo Metronic454CCustomHelperAjax::get_div_ajax_full();
+?>
+<?php
+echo \B2b\Models\CoreModels\PpB2bAdminMetronic454PluginPageHelperHeader::Get_Page_Header();
+?>
+
+<!-- END PAGE HEADER-->
+<!-- BEGIN MAIN CONTENT -->
+<?php
+echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Page_DataTableAjax();
+?>
+
+<!-- END MAIN CONTENT -->
+
+<!-- BEGIN PAGE LEVEL PLUGINS 
+<script src="/<?php echo $assetspath; ?>global/plugins/bootstrap-confirmation/bootstrap-confirmation.min.js" type="text/javascript"></script>-->
+<!-- END MAIN JS -->
+<script type="text/javascript">
+    runeveryinner();
+    var MyModalInitPage = function () {
+        Form1Click();
+    }
+    var MyModalOnClose = function () {
+        //alert('close');
+        grid.getDataTable().ajax.reload();
+    }
+
+    myaoColumns = <?php echo $di->controller_params_array[CHCrmCParams::$keyarrDataTableAjax]['myaoColumns']; ?>;
+
+<?php
+echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Js_Function_MyRunForm('');
+?>
+
+<?php $pluginarrparams = $di->controller_params_array[\CHCrmCParams::$keyarrDataTableAjax]; ?>
+    function resetform(disablefrom)
+    {
+        $(".divtdmydescfrom").css({'background-color': ''});
+        $(".myfield-newrecord-myqtyfrom").css({'background-color': ''});
+        $(".myfield-newrecord-mybarcodeto").css({'background-color': ''});
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').each(function () {
+            $(this).val('');
+            $(this).prop('readonly', true);
+        });
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').filter('[class*="bs-select"]').each(function () {
+            $(this).val('-1');
+            $(this).prop('disabled', true);
+        });
+        $(".tblnewrecord").find('[class*="divtd"]').filter('[class*="rocontent"]').each(function () {
+            $(this).html('');
+        });
+        $(".tblnewrecord").find('.myfield-newrecord-mybarcodefrom').prop('readonly', disablefrom);
+        $(".myfield-newrecord-mybarcodefrom").focus();
+    }
+    function updateform(result)
+    {
+        $(".divtdmydescfrom").css({'background-color': ''});
+        $(".myfield-newrecord-myqtyfrom").css({'background-color': ''});
+        $(".myfield-newrecord-mybarcodeto").css({'background-color': ''});
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').each(function () {
+            $(this).val('');
+            $(this).prop('readonly', false);
+        });
+        $(".tblnewrecord").find('[class*="myfield-newrecord-"]').filter('[class*="bs-select"]').each(function () {
+            $(this).val('-1');
+            $(this).prop('disabled', false);
+        });
+        $(".divtdmydescfrom").html(result.data[0].mydescfrom);
+        
+        $(".divtdmonadapolisistitlefrom").html(result.data[0].monadapolisistitlefrom);
+        $(".myfield-newrecord-myqtyfrom").val(result.data[0].myqtyfrom);
+        $(".myfield-newrecord-mybarcodefrom").val(result.data[0].mybarcodefrom);
+        $(".myfield-newrecord-mybarcodeto").val(result.data[0].mybarcodeto);
+        $(".myfield-newrecord-mybarcodeto").prop('readonly', true);
+        $(".divtdmydescto").html(result.data[0].mydescto);
+        $(".divtdmyqtyto").html(result.data[0].myqtyfrom+"->"+result.data[0].myqtyto);
+        $(".myfield-newrecord-myqtyto").prop('readonly', true);
+        $(".divtdmonadapolisistitleto").html(result.data[0].monadapolisistitleto);
+        $(".divtdmyhopeto").html(result.data[0].myhopeto);
+        $(".divtdmymasteritemto").html(result.data[0].mymasteritemto);
+        $(".divtdmytimikostousto").html(result.data[0].mytimikostousto);
+        $(".divtdmytimipolisisto").html(result.data[0].mytimipolisisto);
+
+
+        $(".tblnewrecord").find('.myfield-newrecord-mybarcodefrom').prop('readonly', true);
+        $(".myfield-newrecord-myqtyfrom").focus();
+    }
+    $("<?php echo B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::Get_Identity_Class_New_Record('mybarcodefrom', true); ?>").keyup(function (e) {
+
+        if (e.keyCode == 13) {
+            var data = {};
+            var metadata = {};
+            var alert_divid = '#bootstrap_alert_common';
+            var alert_msg = 'Unkown Error1';
+            var alert_icon = "check";
+            var alert_type = "error";
+            var myurl = "<?php echo MyCustomHelperPages::makePage(CHCrmCConstantsPages::CONST_PAGES_ADMIN_DYNPAGE_HELPERPAGE_PARAM3, array('helperpage' => $di->controller_params_array['settings']['Helper_Page_Posts'], 'param1' => 'getrecord', 'param2' => 'vf_erp_my_items_metasiskevasia_antistixisi_m', 'param3' => 'mybarcodefrom')); ?>" + $(this).val() + "/";
+            data[$(this).attr('name')] = $(this).val();
+            $.ajax({
+                url: myurl,
+                type: "POST",
+                async: true,
+                dataType: "json",
+                data: {
+                    settings: data
+                },
+                success: function (result) {
+                    if (result.success == 1) {
+                        alert_type = "success";
+                        alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::$AvailablePluginAliasName, 'datatablesv11010_inner_home_erp_krestena_my_items_metasiskevasia_proiontaRecordfound1'); ?>';
+                        updateform(result);
+                    } else
+                    {
+                        resetform(false);
+                        alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::$AvailablePluginAliasName, 'datatablesv11010_inner_home_erp_krestena_my_items_metasiskevasia_proiontaNorecordfound2'); ?>';
+                        alert_type = "warning";
+                        toastrMsg('', alert_msg, alert_type);
+                    }
+
+                },
+                error: function () {
+                    resetform(false);
+                    alert_msg = '<?php echo B2b\Models\CoreModels\PpB2bAdminVfroutepageplugintranslateavailableplugin::Get_Translation(B2b\Models\CoreModels\PpB2bAdminMetronic454PluginDataTableAjax::$AvailablePluginAliasName, 'datatablesv11010_inner_home_erp_krestena_my_items_metasiskevasia_proiontaUnkownErrorDuringfirststep'); ?>';
+                    alert_type = "error";
+                    toastrMsg('', alert_msg, alert_type);
+                }
+            });
+            return false;
+        }
+    });
+
+
+
+</script>
+
