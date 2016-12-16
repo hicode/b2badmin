@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Batch Mockup
+ * Batch Mockup1
  *
  * I placed this in my BaseController.php file
  *
