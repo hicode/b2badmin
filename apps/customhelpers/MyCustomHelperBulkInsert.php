@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Batch Mockup1
+ * Working with bind parameteres to avoid Sql Injection and work with all databases not only Mysql where the original file was.
+ * Batch Ppantelakis
  *
  * I placed this in my BaseController.php file
  *
